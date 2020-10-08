@@ -9,5 +9,5 @@ def md5(fname):
     return hash_md5.hexdigest()
 
 
-print(md5(r"/Users/petterboussard/Documents/obl-2-redes/obligatoriocopy.pdf"))
-print(os.path.getsize("/Users/petterboussard/Documents/obl-2-redes/obligatoriocopy.pdf"))
+#print(md5(r"/Users/petterboussard/Documents/obl-2-redes/obligatoriocopy.pdf"))
+#print(os.path.getsize("/Users/petterboussard/Documents/obl-2-redes/obligatoriocopy.pdf"))
