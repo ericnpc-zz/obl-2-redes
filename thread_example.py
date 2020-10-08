@@ -52,4 +52,5 @@ while programaPrincipal:
 print "\nGracias por usar nuestro servicio."
 print "///////////////////////////////////////////////////////\n"
 
+# https://www.youtube.com/watch?v=IEEhzQoKtQU&t=0s
 # https://dzone.com/articles/python-thread-part-1 
