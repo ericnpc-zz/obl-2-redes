@@ -34,7 +34,6 @@ import ipaddress
 IP = unicode(gethostbyname(gethostname()))
 MASK = unicode('255.255.255.0')
 
-
 serverPort = 2020
 clientSocket = socket(AF_INET, SOCK_DGRAM)
 clientSocket.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
