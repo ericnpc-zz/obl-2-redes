@@ -55,3 +55,22 @@ def offerFile(path):
 
 # telnetCliThread = telnetThread()
 # telnetCliThread.start()
+
+
+# MAIN2
+# # inicializo thread con lista
+# announceThread = announcesThread(fileList)
+# announceThread.start()
+
+# # capturo seleccion del usuario
+# md5 = captureUserSelection(fileList)
+
+# if md5 == "":
+#     print("\nAborto Exitoso\n")
+# else:
+#     print("\nDescargando el archivo con MD5: " + md5)
+
+# # actualizando lista de archivos del thread
+# newFileList = {}
+# newFileList["TUVIEJA"] = dict1
+# announceThread.setFileList(newFileList)
