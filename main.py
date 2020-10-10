@@ -1,7 +1,7 @@
 import testing_md5
 import anuncios
 
-remoteFiles = 
+remoteFiles = []
 
 # localFiles.append({
 # 	fileName: 'pepito.js',
