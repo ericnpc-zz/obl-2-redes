@@ -3,20 +3,14 @@ def offeredFiles(files):
     return files.keys()
 
 
-def displayFile(index, file):
+def getFileDescription(index, file):
     fileSize = file["size"]
     fileNames = ""
-    for name in file["filenames"]:
+    for name in file["names"]:
         fileNames += " "
-        fileNames += name
+        fileNames += name + ', '
 
-    print str(index) + ". Tamano: " + fileSize + " // Nombres:" + fileNames
-
-
-def displayFiles(fileList, fileKeys):
-    for index, md5 in enumerate(fileKeys, start=1):
-        file = fileList[md5]
-        displayFile(index, file)
+    return str(index) + ". Tamano: " + str(fileSize) + " // Nombres:" + fileNames[:-1] + "\n"
 
 
 def representedInt(s):
@@ -27,9 +21,24 @@ def representedInt(s):
         return -1
 
 
+def getFileListDescription(fileList):
+    fileKeys = offeredFiles(fileList)
+    fileString = ""
+
+    for index, md5 in enumerate(fileKeys, start=1):
+        file = fileList[md5]
+        fileString += getFileDescription(index, file)
+    
+    return fileString
+
+
+def printFileListDescription(fileList):
+    print(getFileListDescription(fileList))
+
+
 def captureUserSelection(fileList):
     fileKeys = offeredFiles(fileList)
-    displayFiles(fileList, fileKeys)
+    printFileListDescription(fileList)
     md5 = ""
 
     while True:
@@ -40,7 +49,7 @@ def captureUserSelection(fileList):
             print("\nOK. Se descargara el siguiente archivo:")
             md5 = fileKeys[fileIndexInt]
             file = fileList[md5]
-            displayFile(fileIndex, file)
+            print(getFileDescription(fileIndex, file))
             break
         elif fileIndex == "exit":
             break
@@ -49,3 +58,9 @@ def captureUserSelection(fileList):
 
     return md5
 
+def announce(localFiles): 
+    message = "ANNOUNCE\n"
+    for file in localFiles:
+        message += file['fileName'] + "\t" + str(file['size']) + "\t" + file['md5'] + "\n"
+
+    return message

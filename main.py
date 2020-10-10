@@ -1,27 +1,29 @@
 import testing_md5
-import telnetThread
+# import telnetThread
 # import anuncios
 
 remoteFiles = {}
+localFiles = []
 
-# localFiles.append({
-# 	fileName: 'pepito.js',
-# 	fileSize: 203859400,
-# 	fileMD5: 'hdaksehqi378437n73qkay3874q3'
-# })
+localFiles.append({
+	'fileName': 'pepito.js',
+	'size': 203859400,
+	'md5': 'hdaksehqi378437n73qkay3874q3'
+})
 
-remoteFiles['md5'] = {
+# TODO: cambiar esta estructura
+remoteFiles['hdaksehqi378437n73qkay3874q'] = {
         'hostIPs': ['121.21.21.3', '234.325.123.12'],
         'names': ['pepito.js', 'perrito.js'],
         'size': 234234234
-    }
+}
 
 def listRemoteFiles():
 
     remoteFilesString = ''
     fileId = 0
 
-    # lock remoteFiles 
+    # lock remotseFiles 
     for key in list(remoteFiles.keys()):
         print(key)
         f = remoteFiles[key]
@@ -43,13 +45,13 @@ def offerFile(path):
     _md5 = testing_md5.md5(path)
     _size = testing_md5.size(path)
 
-    anuncios.localFiles.append({
+    localFiles.append({
         "md5": _md5,
         "size": _size,
         "fileName": path
     })
 
-    return anuncios.localFiles
+    return localFiles
 
-telnetCliThread = telnetThread()
-telnetCliThread.start()
+# telnetCliThread = telnetThread()
+# telnetCliThread.start()
