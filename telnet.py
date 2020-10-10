@@ -27,12 +27,15 @@ while True:
 
 		if command == COMMAND_LIST:
 			files = utils_file_input.getFileListDescription(main.remoteFiles)
+			# popular la lista local de indices->md5
 			connectionSocket.send(files)
 
 		elif re.match("get .*", command):
 			# fileId = command.split('get ')[1]
 			# main.getFile(fileId)
 			# print(fileId)
+			
+			#if isempty la lista local la calculo
 			connectionSocket.send("hola")
 
 		elif re.match("offer .*", command):
