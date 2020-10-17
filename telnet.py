@@ -1,22 +1,48 @@
 from socket import *
-import clientUDP
+# import clientUDP
 import utils_file_input
 import re
 import main
+import fileDownloader
 
 COMMAND_EXIT = 'exit'
 COMMAND_LIST = 'list'
 COMMAND_OFFER = 'offer'
 COMMAND_GET = 'get'
 
-serverPort = 2029
+remoteFileListOfMD5 = []
+remoteFiles = {}
+
+serverPort = 2023
 serverSocket = socket(AF_INET, SOCK_STREAM)
 serverSocket.bind(('', serverPort))
 # string vacio porque https://stackoverflow.com/questions/16130786/why-am-i-getting-the-error-connection-refused-in-python-sockets/16130819
-serverSocket.listen(1)
+serverSocket.listen(0)
+
 
 print('The telnet server is ready to receive commands')
-clientUDP.initializeClient()
+# clientUDP.initializeClient()
+
+def prepareForDownload(fileMD5): 
+	size = remoteFiles[fileMD5]['size']
+	hosts = remoteFiles[fileMD5]['hostIPs']
+	packetSize = size / len(hosts)
+	packetRemain = size % len(hosts)
+	
+	for i in range(len(hosts)):
+		size = packetSize
+		host = hosts[i]
+		print('len hosts' + str(len(hosts)-1))
+		if i == len(hosts)-1:
+			size =+ packetRemain 
+
+		start = i * packetSize
+		print('host' + host)
+		print('size' + str(size))
+		print('start' + str(start))
+		print(fileMD5)
+		# fileDownloader.downloadViaTCP(host, size, start, fileMD5)
+
 
 while True:
 	connectionSocket, addr = serverSocket.accept()
@@ -26,16 +52,20 @@ while True:
 		print(command)
 
 		if command == COMMAND_LIST:
-			files = utils_file_input.getFileListDescription(main.remoteFiles)
+			remoteFiles = main.getRemoteFiles()
+			remoteFileListOfMD5 = remoteFiles.keys()
+			files = utils_file_input.getFileListDescription(remoteFiles)
 			# popular la lista local de indices->md5
+			print(remoteFileListOfMD5)
 			connectionSocket.send(files)
 
 		elif re.match("get .*", command):
-			# fileId = command.split('get ')[1]
+			fileId = command.split('get ')[1]
+			fileMD5 = remoteFileListOfMD5[int(fileId) - 1] 
+			prepareForDownload(fileMD5)
 			# main.getFile(fileId)
-			# print(fileId)
-			
-			#if isempty la lista local la calculo
+			# if remoteFileList
+			# manejar el caso en que la lista sea null
 			connectionSocket.send("hola")
 
 		elif re.match("offer .*", command):

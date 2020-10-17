@@ -1,4 +1,6 @@
 import testing_md5
+from threading import Thread, Lock
+
 # import telnetThread
 # import anuncios
 
@@ -15,8 +17,28 @@ localFiles.append({
 remoteFiles['hdaksehqi378437n73qkay3874q'] = {
         'hostIPs': ['121.21.21.3', '234.325.123.12'],
         'names': ['pepito.js', 'perrito.js'],
-        'size': 234234234
+        'size': 115
 }
+
+# getter de remoteFiles, solo se va a acceder a esta var
+# global, llamando a esta funcion
+def getRemoteFiles():
+    mutex = Lock()
+    mutex.acquire()
+    _remoteFiles = remoteFiles.copy()
+    mutex.release()
+    return _remoteFiles
+
+# setter de remoteFiles, solo se va a acceder a esta var
+# global, llamando a esta funcion
+def setRemoteFiles():
+    print('conchudo')
+    # mutex = Lock()
+    # mutex.acquire()
+    # _remoteFiles = remoteFiles.copy()
+    # mutex.release()
+    # return _remoteFiles
+
 
 def listRemoteFiles():
 
@@ -52,6 +74,9 @@ def offerFile(path):
     })
 
     return localFiles
+
+def getFile(fileMD5):
+    file = file
 
 # telnetCliThread = telnetThread()
 # telnetCliThread.start()

@@ -1,8 +1,3 @@
-
-def offeredFiles(files):
-    return files.keys()
-
-
 def getFileDescription(index, file):
     fileSize = file["size"]
     fileNames = ""
@@ -22,7 +17,7 @@ def representedInt(s):
 
 
 def getFileListDescription(fileList):
-    fileKeys = offeredFiles(fileList)
+    fileKeys = fileList.keys()
     fileString = ""
 
     for index, md5 in enumerate(fileKeys, start=1):
@@ -37,7 +32,7 @@ def printFileListDescription(fileList):
 
 
 def captureUserSelection(fileList):
-    fileKeys = offeredFiles(fileList)
+    fileKeys = fileList.keys()
     printFileListDescription(fileList)
     md5 = ""
 
