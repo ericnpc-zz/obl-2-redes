@@ -4,6 +4,7 @@ import utils_file_input
 import re
 import main
 import fileDownloader
+import os
 
 COMMAND_EXIT = 'exit'
 COMMAND_LIST = 'list'
@@ -28,6 +29,7 @@ def prepareForDownload(fileMD5):
 	hosts = remoteFiles[fileMD5]['hostIPs']
 	packetSize = size / len(hosts)
 	packetRemain = size % len(hosts)
+	fileName = os.path.split(remoteFiles[fileMD5]['hosts'][0]['name'])
 	
 	for i in range(len(hosts)):
 		size = packetSize
@@ -41,7 +43,7 @@ def prepareForDownload(fileMD5):
 		print('size' + str(size))
 		print('start' + str(start))
 		print(fileMD5)
-		# fileDownloader.downloadViaTCP(host, size, start, fileMD5)
+		fileDownloader.downloadViaTCP(host, size, start, fileMD5, fileName)
 
 
 while True:
