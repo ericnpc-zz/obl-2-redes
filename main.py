@@ -15,8 +15,8 @@ localFiles.append({
 
 remoteFiles['hdaksehqi378437n73qkay3874q']= {
         'size': 115
-        'hosts': [ {'ip': '121.21.21.3',
-                    'name': 'pepito.js'
+        'hosts': [ {'ip': '192.168.1.5',
+                    'name': '/Users/nadiarecarey/Desktop/Screen Recording 2020-10-14 at 7.21.45 PM.mov'
                     'lastAnnounced': datetime.now()
                     }, 
                     {'ip': '234.325.123.12',

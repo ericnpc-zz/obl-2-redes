@@ -24,28 +24,6 @@ serverSocket.listen(0)
 print('The telnet server is ready to receive commands')
 # clientUDP.initializeClient()
 
-def prepareForDownload(fileMD5): 
-	size = remoteFiles[fileMD5]['size']
-	hosts = remoteFiles[fileMD5]['hostIPs']
-	packetSize = size / len(hosts)
-	packetRemain = size % len(hosts)
-	fileName = os.path.split(remoteFiles[fileMD5]['hosts'][0]['name'])
-	
-	for i in range(len(hosts)):
-		size = packetSize
-		host = hosts[i]
-		print('len hosts' + str(len(hosts)-1))
-		if i == len(hosts)-1:
-			size =+ packetRemain 
-
-		start = i * packetSize
-		print('host' + host)
-		print('size' + str(size))
-		print('start' + str(start))
-		print(fileMD5)
-		fileDownloader.downloadViaTCP(host, size, start, fileMD5, fileName)
-
-
 while True:
 	connectionSocket, addr = serverSocket.accept()
 	exit = False
@@ -64,7 +42,7 @@ while True:
 		elif re.match("get .*", command):
 			fileId = command.split('get ')[1]
 			fileMD5 = remoteFileListOfMD5[int(fileId) - 1] 
-			prepareForDownload(fileMD5)
+			fileDownloader.prepareForDownload(fileMD5)
 			# main.getFile(fileId)
 			# if remoteFileList
 			# manejar el caso en que la lista sea null

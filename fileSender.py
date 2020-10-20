@@ -8,14 +8,17 @@ serverSocket.listen(1)
 
 print('El servidor esta listo para recibir pedidos')
 
-def sendFile(fileName, connectionSocket):
-	file_to_send = open("/Users/petterboussard/Desktop/download.png", 'rb')
+def sendFile(fileName, clientSocket):
+	file_to_send = open("/Users/nadiarecarey/Desktop/Screen Recording 2020-10-14 at 7.21.45 PM.mov", 'rb')
 	file_data = file_to_send.read(4096)
-	connectionSocket.send(file_data)
-	connectionSocket.close()
+	while (file_data):
+		clientSocket.send(file_data)
+		file_data = file_to_send.read(4096)
+
+	clientSocket.close()
 
 while True: 
-	connectionSocket, addr = serverSocket.accept()
-	t = threading.Thread(target=sendFile, args=['asdasd', connectionSocket])
+	clientSocket, addr = serverSocket.accept()
+	t = threading.Thread(target=sendFile, args=['asdasd', clientSocket])
 	t.start()
 
