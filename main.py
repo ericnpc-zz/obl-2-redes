@@ -13,11 +13,17 @@ localFiles.append({
 	'md5': 'hdaksehqi378437n73qkay3874q3'
 })
 
-# TODO: cambiar esta estructura
-remoteFiles['hdaksehqi378437n73qkay3874q'] = {
-        'hostIPs': ['121.21.21.3', '234.325.123.12'],
-        'names': ['pepito.js', 'perrito.js'],
+remoteFiles['hdaksehqi378437n73qkay3874q']= {
         'size': 115
+        'hosts': [ {'ip': '192.168.1.5',
+                    'name': '/Users/nadiarecarey/Desktop/Screen Recording 2020-10-14 at 7.21.45 PM.mov'
+                    'lastAnnounced': datetime.now()
+                    }, 
+                    {'ip': '192.168.1.2',
+                     'name': 'perrito.js',
+                     'lastAnnounced': datetime.now()
+                    }
+                  ]        
 }
 
 # getter de remoteFiles, solo se va a acceder a esta var
