@@ -19,6 +19,7 @@ def sendFile(fileName, clientSocket):
 
 while True: 
 	clientSocket, addr = serverSocket.accept()
+	print('conexion aceptada')
 	t = threading.Thread(target=sendFile, args=['asdasd', clientSocket])
 	t.start()
 
