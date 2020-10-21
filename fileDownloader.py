@@ -49,12 +49,21 @@ def prepareForDownload(fileMD5, fileMetadata):
 def downloadViaTCP(hostIP, size, start, md5, fileName):
 	print('//////////////////\n' + 'Downloading from ' + str(hostIP) + '\n//////////////////\n\n')
     
-	serverPort = 2030
+	serverPort = 2031
 	clientSocket = socket(AF_INET, SOCK_STREAM)
 	clientSocket.connect((hostIP, serverPort))
 
+	downloadMessage = "DOWNLOAD\n" + md5 + "\n" + str(start) + "\n" + str(size)
+	clientSocket.send(downloadMessage.encode())
+
 	received_file = open(fileName,'wb')
 	file_data_from_server = clientSocket.recv(4096)
+	print('#############' + str(start))
+	print(file_data_from_server)
+	print('#############')
+	file_data_from_server = file_data_from_server.split('DOWNLOAD OK\n')
+	print(file_data_from_server)
+	file_data_from_server = file_data_from_server[1]
 	while (file_data_from_server):
 		received_file.write(file_data_from_server)
 		file_data_from_server = clientSocket.recv(4096)
@@ -65,19 +74,18 @@ def downloadViaTCP(hostIP, size, start, md5, fileName):
 remoteFiles = {}
 
 remoteFiles['a']= {
-        'size': 874365,
+        'size': 38173178,
         'hosts': [ {'ip': 'localhost',
-                    'name': '/Users/nadiarecarey/Desktop/Screen Recording 2020-10-14 at 7.21.45 PM.mov'
-                    # 'lastAnnounced': datetime.now()
-                    # }, 
-                    # {'ip': '192.168.1.2',
-                    #  'name': 'perrito.js'
-                    # #  'lastAnnounced': datetime.now()
-                    },{
-                     'ip': '10.0.1.133'
+                    'name': 'nombre_random.algo',
+                    'lastAnnounced': 'fecha'
+                    }, 
+                    {'ip': '10.0.1.133',
+                     'name': 'perrito.js',
+                     'lastAnnounced': 'fecha'
                     }
-                  ]        
+                  ]     
 }
+
 fileMD5 = 'a'
 fileMetadata = remoteFiles[fileMD5]
 prepareForDownload(fileMD5, fileMetadata)
