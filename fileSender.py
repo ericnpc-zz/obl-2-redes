@@ -9,7 +9,7 @@ serverSocket.listen(1)
 print('El servidor esta listo para recibir pedidos')
 
 def sendFile(fileName, clientSocket):
-	file_to_send = open("/Users/nadiarecarey/Desktop/Screen Recording 2020-10-14 at 7.21.45 PM.mov", 'rb')
+	file_to_send = open("/Users/petterboussard/Documents/asd.mp4", 'rb')
 	file_data = file_to_send.read(4096)
 	while (file_data):
 		clientSocket.send(file_data)
