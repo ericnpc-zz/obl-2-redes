@@ -20,7 +20,7 @@ def sendFile(clientSocket):
 
 	while (file_data and bytes_to_send > 0):
 		clientSocket.send(file_data)
-		bytes_to_send =- BUFFER_SIZE
+		bytes_to_send = bytes_to_send - BUFFER_SIZE
 		file_data = file_to_send.read(min(BUFFER_SIZE, bytes_to_send))
 
 	clientSocket.close()
