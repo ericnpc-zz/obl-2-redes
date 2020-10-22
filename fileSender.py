@@ -11,7 +11,7 @@ def sendFile(clientSocket):
 
 	md5, start, size = messageFromDownloader
 
-	file_to_send = open("/Users/petterboussard/Documents/asd.mp4", 'rb')
+	file_to_send = open("/users/eric/desktop/tvs.drawio", 'rb')
 	file_to_send.seek(int(start))
 
 	bytes_to_send = int(size)
@@ -25,7 +25,7 @@ def sendFile(clientSocket):
 
 	clientSocket.close()
 
-def fileSender():
+def startListening():
 	serverPort = 2030
 	serverSocket = socket(AF_INET, SOCK_STREAM)
 	serverSocket.bind(('', serverPort))
@@ -38,5 +38,3 @@ def fileSender():
 		print('conexion aceptada')
 		t = threading.Thread(target=sendFile, args=[clientSocket])
 		t.start()
-
-fileSender()
