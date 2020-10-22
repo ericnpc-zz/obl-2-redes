@@ -1,6 +1,8 @@
 from socket import *
 from threading import Thread
+import utils_file_input
 import os
+
 
 def prepareForDownload(fileMD5, fileMetadata): 
 	size = fileMetadata['size']
@@ -30,7 +32,7 @@ def prepareForDownload(fileMD5, fileMetadata):
 		print('//////////////////\n Joining Thread\n/////////////////\n')
 		thread.join()
 	
-	final_file = open('ARCHIVO_RECIBIDO.mp4', 'wb')
+	final_file = open(fileName, 'wb')
 
 	for i in range(len(hosts)):
 		file_part = open(fileName + '.part' + str(i), 'rb')
@@ -41,8 +43,11 @@ def prepareForDownload(fileMD5, fileMetadata):
 			final_file.write(file_data)
 
 		file_part.close()
+		os.remove(fileName + '.part' + str(i))
 		#tenemos que borrar los archivos temporales
 	final_file.close()
+
+	print("MD5 Check: ", utils_file_input.md5(fileName) == fileMD5)
 
 
 def downloadViaTCP(hostIP, size, start, md5, fileName):
@@ -76,22 +81,22 @@ def downloadViaTCP(hostIP, size, start, md5, fileName):
 	received_file.close()
 	clientSocket.close()
 
-remoteFiles = {}
+# remoteFiles = {}
 
-remoteFiles['a']= {
-        'size': 38173178,
-        'hosts': [ 
-        			{'ip': 'localhost',
-                    'name': 'nombre_random',
-                    'lastAnnounced': 'fecha'
-                    }, 
-                    {'ip': '10.0.1.133',
-                     'name': 'perrito',
-                     'lastAnnounced': 'fecha'
-                    }
-                  ]     
-}
+# remoteFiles['a90113d8babcbe5fc8e697a5383e83db']= {
+#         'size': 38173178,
+#         'hosts': [ 
+#         			{'ip': 'localhost',
+#                     'name': 'nombre_random.ext',
+#                     'lastAnnounced': 'fecha'
+#                     }, 
+#                     {'ip': '10.0.1.133',
+#                      'name': 'perrito.ext',
+#                      'lastAnnounced': 'fecha'
+#                     }
+#                   ]     
+# }
 
-fileMD5 = 'a'
-fileMetadata = remoteFiles[fileMD5]
-prepareForDownload(fileMD5, fileMetadata)
+# fileMD5 = 'a90113d8babcbe5fc8e697a5383e83db'
+# fileMetadata = remoteFiles[fileMD5]
+# prepareForDownload(fileMD5, fileMetadata)

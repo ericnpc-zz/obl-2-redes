@@ -26,7 +26,7 @@ def sendFile(clientSocket):
 	clientSocket.close()
 
 def fileSender():
-	serverPort = 2031
+	serverPort = 2030
 	serverSocket = socket(AF_INET, SOCK_STREAM)
 	serverSocket.bind(('', serverPort))
 	serverSocket.listen(1)
