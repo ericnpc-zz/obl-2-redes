@@ -46,8 +46,10 @@ def telnetServer():
 	remoteFileListOfMD5 = []
 	remoteFiles = {}
 
-	serverPort = 2031
+	serverPort = 2035
 	serverSocket = socket(AF_INET, SOCK_STREAM)
+	# serverSocket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
+
 	serverSocket.bind(('', serverPort))
 	# string vacio porque https://stackoverflow.com/questions/16130786/why-am-i-getting-the-error-connection-refused-in-python-sockets/16130819
 	serverSocket.listen(0)
@@ -80,14 +82,13 @@ def telnetServer():
 				clientSocket.send("archivo descargado, chau")
 
 			elif re.match("offer .*", command):
-				path = command.split('offer ')[1]
+				path = command.split('offer ')[1].replace('\\','') #agregue esto para soportar archivos con espacios en el nombre
 				l = offerFile(path)
-				print(l)
 				clientSocket.send("File offered successfully\n")
 
 			elif command == COMMAND_EXIT:
 				print('bye')
 				# clientSocket.send(addr + ' ')
 				clientSocket.close()
-				# serverSocket.close()
+				# serverSocket.close()		TODO: esto va, no?
 				exit = True

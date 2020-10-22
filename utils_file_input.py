@@ -1,5 +1,6 @@
 import hashlib
 import os
+import fileRepository
 
 def md5(fname):
     hash_md5 = hashlib.md5()
@@ -66,9 +67,13 @@ def captureUserSelection(fileList):
 
     return md5
 
-def announce(localFiles): 
+def getAnnounceMessage(): 
+    
+    localFiles = fileRepository.getLocalFiles()
+
     message = "ANNOUNCE\n"
     for file in localFiles:
-        message += file['fileName'] + "\t" + str(file['size']) + "\t" + file['md5'] + "\n"
+        fileName = os.path.basename(file['fileName'])
+        message += fileName + "\t" + str(file['size']) + "\t" + file['md5'] + "\n"
 
     return message
