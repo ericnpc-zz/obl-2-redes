@@ -89,5 +89,5 @@ def telnetServer():
 				print('bye')
 				# clientSocket.send(addr + ' ')
 				clientSocket.close()
-				# serverSocket.close()
+				# serverSocket.close()		TODO: esto va, no?
 				exit = True
