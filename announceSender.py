@@ -7,7 +7,8 @@ def startSending():
 	serverPort = 2020
 	clientSocket = socket(AF_INET, SOCK_DGRAM)
 
-	clientSocket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1) #aca comentar bien que son estas options o properties que estmos seteando
+	# https://stackoverflow.com/questions/14388706/how-do-so-reuseaddr-and-so-reuseport-differ
+	clientSocket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1) 
 	clientSocket.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
 
 	while True:
@@ -15,9 +16,8 @@ def startSending():
 		message = utils_file_input.getAnnounceMessage()
 		print("Announce message about to be sent: ", message)
 
-
-
-		clientSocket.sendto(message.encode(),('<broadcast>', serverPort))
+		clientSocket.sendto(message.encode(),('192.168.1.5', serverPort))
+		# clientSocket.sendto(message.encode(),('<broadcast>', serverPort))
 
 		# modifiedMessage, serverAddress = clientSocket.recvfrom(2048)
 		# print(modifiedMessage.decode())

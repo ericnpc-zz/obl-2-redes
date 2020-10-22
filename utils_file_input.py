@@ -73,6 +73,7 @@ def getAnnounceMessage():
 
     message = "ANNOUNCE\n"
     for file in localFiles:
-        message += file['fileName'] + "\t" + str(file['size']) + "\t" + file['md5'] + "\n"
+        fileName = os.path.basename(file['fileName'])
+        message += fileName + "\t" + str(file['size']) + "\t" + file['md5'] + "\n"
 
     return message
