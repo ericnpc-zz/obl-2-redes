@@ -1,5 +1,6 @@
 from socket import *
 import threading
+import fileRepository
 
 BUFFER_SIZE = 4096
 
@@ -11,7 +12,13 @@ def sendFile(clientSocket):
 
 	md5, start, size = messageFromDownloader
 
-	file_to_send = open("/users/eric/desktop/tvs.drawio", 'rb')
+	path = ''
+	localFiles = fileRepository.getLocalFiles()
+	for file in localFiles:
+		if file['md5'] == md5:
+			path = file['fileName']
+
+	file_to_send = open(path, 'rb')
 	file_to_send.seek(int(start))
 
 	bytes_to_send = int(size)

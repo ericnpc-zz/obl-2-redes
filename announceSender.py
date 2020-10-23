@@ -46,8 +46,7 @@ def sendAnnounceMessages(socket):
 			if ANNOUNCE_SENDER_LOG_ENABLED:
 				print("\n///// SENDING ANNOUNCE MESSAGE //////")
 				print(message)
-			# socket.sendto(message.encode(),('<broadcast>', SERVER_PORT))
-			socket.sendto(message.encode(),('192.168.1.5', SERVER_PORT))
+			socket.sendto(message.encode(),('<broadcast>', SERVER_PORT))
 			time.sleep(random.random())
 
 

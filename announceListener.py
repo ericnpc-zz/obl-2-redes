@@ -79,7 +79,7 @@ def handleAnnouncement(message, clientAddress):
 						})		
 				else: 
 					_remoteFiles[fileMD5] = {
-						'size': fileSize,
+						'size': int(fileSize),
 						'hosts': [{
 							'ip': clientAddress[0],
 							'name': fileName,

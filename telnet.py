@@ -48,7 +48,7 @@ def telnetServer():
 	remoteFileListOfMD5 = []
 	remoteFiles = {}
 
-	serverPort = 2076
+	serverPort = 2020
 	global serverSocket
 	serverSocket = socket(AF_INET, SOCK_STREAM)
 	# serverSocket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
