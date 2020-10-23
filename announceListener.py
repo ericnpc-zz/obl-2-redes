@@ -65,10 +65,10 @@ def handleAnnouncement(message, clientAddress):
 				if _remoteFiles.has_key(fileMD5):
 					file = _remoteFiles[fileMD5]
 
-					isPresent = false
+					isPresent = False
 					for host in file['hosts']:
 						if host['ip'] == clientAddress[0]:
-							isPresent = true
+							isPresent = True
 							host['lastAnnounced'] = datetime.now()
 
 					if not isPresent:
@@ -96,11 +96,11 @@ def handleAnnouncement(message, clientAddress):
 
 		fileRepository.setRemoteFiles(_remoteFiles)
 
-		_remoteFiles = fileRepository.getRemoteFiles()
-		print('Remote files updated: ', _remoteFiles)
+		aa = fileRepository.getRemoteFiles()
+		print('Remote files updated: ', aa)
 	elif messageType == 'REQUEST':
 		print('REQUEST')
-		
+
 def forceClose():
 	global serverSocket
 	serverSocket.close()
