@@ -8,7 +8,7 @@ import threading
 from datetime import datetime
 
 SERVER_PORT = 2020
-ANNOUNCE_SENDER_LOG_ENABLED = True
+ANNOUNCE_SENDER_LOG_ENABLED = False
 MAXIMUM_ANNOUNCE_SIZE = 1450 
 # TODO: Agregar fuentes e investigar por que
 # TODO: Esperando respuesta de Mati
@@ -52,6 +52,7 @@ def sendAnnounceMessages(socket):
 
 
 def startSending(): 
+	global clientSocket
 	clientSocket = socket(AF_INET, SOCK_DGRAM)
 	# https://stackoverflow.com/questions/14388706/how-do-so-reuseaddr-and-so-reuseport-differ
 	clientSocket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1) 
@@ -63,3 +64,8 @@ def startSending():
 		time.sleep(30 + random.random())
 
 	clientSocket.close()
+
+def forceClose():
+	global clientSocket
+	clientSocket.close()
+	print('Announce Sender Socket Closed')

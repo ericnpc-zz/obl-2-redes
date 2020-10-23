@@ -1,8 +1,11 @@
 from socket import *
 
+global serverSocket
+
 def startListening():
 
 	serverPort = 2020
+	global serverSocket
 	serverSocket = socket(AF_INET, SOCK_DGRAM)
 	# serverSocket.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
 	serverSocket.bind(('', serverPort))
@@ -38,6 +41,11 @@ def startListening():
 		# serverSocket.sendto(message.encode(), clientAddress)
 
 	# def handleAnnouncement:
+
+def forceClose():
+	global serverSocket
+	serverSocket.close()
+	print('Announce Listener Socket Closed')
 
 
 	
