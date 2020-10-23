@@ -15,63 +15,72 @@ remoteFiles = {}
 localFiles = []
 
 # Ejemplo de LocalFiles:
-# localFiles.append({
-# 	'fileName': 'Nombre.ext',
-# 	'size': 1234,
-# 	'md5': 'MD5'
-# })
+# for i in range(150):
+#     localFiles.append({
+#         'fileName': 'Nombre.ext',
+#         'size': i,
+#         'md5': 'MD5'
+#     })
 
-remoteFiles['hdaksehqi378437n73qkay3874q']= {
-        'size': 38173178,
-        'hosts': [ {'ip': 'localhost',
-                    'name': 'archivo_descargado.txt',
-                    'lastAnnounced': datetime.now()
-                    # }, 
-                    # {'ip': '10.0.1.133',
-                    #   'name': 'perrito.ext',
-                    #  'lastAnnounced': datetime.now()
-                    }
-                  ]        
-}
+# remoteFiles['hdaksehqi378437n73qkay3874q']= {
+#         'size': 38173178,
+#         'hosts': [ {'ip': 'localhost',
+#                     'name': 'archivo_descargado.txt',
+#                     'lastAnnounced': datetime.now()
+#                     # }, 
+#                     # {'ip': '10.0.1.133',
+#                     #   'name': 'perrito.ext',
+#                     #  'lastAnnounced': datetime.now()
+#                     }
+#                   ]        
+# }
 
 localFileLock = Lock()
 remoteFileLock = Lock()
 
 def getLocalFile(index):
     localFileLock.acquire()
+    global localFiles
     _localFile = localFiles[index].copy()
     localFileLock.release()
     return _localFile
 
 def getLocalFiles():
     localFileLock.acquire()
+    global localFiles
     _localFiles = localFiles[:]
     localFileLock.release()
     return _localFiles
 
 def setLocalFile(localFile):
     localFileLock.acquire()
+    global localFiles
     localFiles.append(localFile)
     localFileLock.release()
 
 def getRemoteFile(md5):
     remoteFileLock.acquire()
+    global remoteFiles
     _remoteFile = remoteFiles[md5].copy()
     remoteFileLock.release()
     return _remoteFile
 
 def getRemoteFiles():
     remoteFileLock.acquire()
+    global remoteFiles
     _remoteFiles = remoteFiles.copy()
     remoteFileLock.release()
+
     return _remoteFiles
 
-def setRemoteFile(md5, value):
+def setRemoteFiles(value):
     remoteFileLock.acquire()
-    remoteFiles[md5] = value
+    global remoteFiles
+    remoteFiles = value.copy()
     remoteFileLock.release()
 
 def deleteRemoteFile(md5):
     remoteFileLock.acquire()
+    global remoteFiles
     remoteFiles.pop(md5)
     remoteFileLock.release()

@@ -5,6 +5,8 @@ import fileDownloader
 import fileRepository
 import os
 
+global serverSocket
+
 def getFile(fileMD5):
 	file = file
 
@@ -46,7 +48,8 @@ def telnetServer():
 	remoteFileListOfMD5 = []
 	remoteFiles = {}
 
-	serverPort = 2035
+	serverPort = 2076
+	global serverSocket
 	serverSocket = socket(AF_INET, SOCK_STREAM)
 	# serverSocket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
 
@@ -92,3 +95,9 @@ def telnetServer():
 				clientSocket.close()
 				# serverSocket.close()		TODO: esto va, no?
 				exit = True
+
+# TODO: Borrar si no sirve - junto con los globals
+def forceClose():
+	global serverSocket
+	serverSocket.close()
+	print('Telnet Socket Closed')
