@@ -15,11 +15,12 @@ remoteFiles = {}
 localFiles = []
 
 # Ejemplo de LocalFiles:
-# localFiles.append({
-# 	'fileName': 'Nombre.ext',
-# 	'size': 1234,
-# 	'md5': 'MD5'
-# })
+for i in range(150):
+    localFiles.append({
+        'fileName': 'Nombre.ext',
+        'size': i,
+        'md5': 'MD5'
+    })
 
 # remoteFiles[
 # 'hdaksehqi378437n73qkay3874q']= {

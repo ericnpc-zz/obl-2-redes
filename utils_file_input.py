@@ -67,15 +67,10 @@ def captureUserSelection(fileList):
 
     return md5
 
-def getAnnounceMessage(): 
-    
-    localFiles = fileRepository.getLocalFiles()
-    message = ''
-
-    if len(localFiles) > 0 :
-        message = "ANNOUNCE\n"
-        for file in localFiles:
-            fileName = os.path.basename(file['fileName'])
-            message += fileName + "\t" + str(file['size']) + "\t" + file['md5'] + "\n"
+def formatAnnounceList(fileList): 
+    message = "ANNOUNCE\n"
+    for file in fileList:
+        fileName = os.path.basename(file['fileName'])
+        message += fileName + "\t" + str(file['size']) + "\t" + file['md5'] + "\n"
 
     return message
