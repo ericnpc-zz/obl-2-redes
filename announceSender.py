@@ -14,14 +14,15 @@ def startSending():
 	while True:
 
 		message = utils_file_input.getAnnounceMessage()
-		print("Announce message about to be sent: ", message)
+		if message != '':
+			print("Announce message about to be sent: ", message)
 
-		clientSocket.sendto(message.encode(),('192.168.1.5', serverPort))
-		# clientSocket.sendto(message.encode(),('<broadcast>', serverPort))
+			clientSocket.sendto(message.encode(),('192.168.1.5', serverPort))
+			# clientSocket.sendto(message.encode(),('<broadcast>', serverPort))
 
-		# modifiedMessage, serverAddress = clientSocket.recvfrom(2048)
-		# print(modifiedMessage.decode())
+			# modifiedMessage, serverAddress = clientSocket.recvfrom(2048)
+			# print(modifiedMessage.decode())
 
-		time.sleep(5 + random.random()) # TODO: Tiene que ser 30 segs
+		time.sleep(15 + random.random()) # TODO: Tiene que ser 30 segs
 
 	clientSocket.close()

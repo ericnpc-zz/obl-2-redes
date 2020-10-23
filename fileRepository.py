@@ -21,18 +21,19 @@ localFiles = []
 # 	'md5': 'MD5'
 # })
 
-remoteFiles['hdaksehqi378437n73qkay3874q']= {
-        'size': 38173178,
-        'hosts': [ {'ip': 'localhost',
-                    'name': 'archivo_descargado.txt',
-                    'lastAnnounced': datetime.now()
-                    # }, 
-                    # {'ip': '10.0.1.133',
-                    #   'name': 'perrito.ext',
-                    #  'lastAnnounced': datetime.now()
-                    }
-                  ]        
-}
+# remoteFiles[
+# 'hdaksehqi378437n73qkay3874q']= {
+#         'size': 38173178,
+#         'hosts': [ {'ip': 'localhost',
+#                     'name': 'archivo_descargado.txt',
+#                     'lastAnnounced': datetime.now()
+#                     # }, 
+#                     # {'ip': '10.0.1.133',
+#                     #   'name': 'perrito.ext',
+#                     #  'lastAnnounced': datetime.now()
+#                     }
+                #   ]        
+# }
 
 localFileLock = Lock()
 remoteFileLock = Lock()
@@ -64,11 +65,15 @@ def getRemoteFiles():
     remoteFileLock.acquire()
     _remoteFiles = remoteFiles.copy()
     remoteFileLock.release()
+    print('=================================> remoteFiles EN GET: ', _remoteFiles)
+
     return _remoteFiles
 
-def setRemoteFile(md5, value):
+def setRemoteFiles(value):
     remoteFileLock.acquire()
-    remoteFiles[md5] = value
+    print('======================> value: ', value)
+    remoteFiles = value.copy()
+    print('======================> remoteFiles: ', remoteFiles)
     remoteFileLock.release()
 
 def deleteRemoteFile(md5):
