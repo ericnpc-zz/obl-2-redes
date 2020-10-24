@@ -7,9 +7,6 @@ import os
 
 global serverSocket
 
-def getFile(fileMD5):
-	file = file
-
 def offerFile(path):
 	_md5 = utils_file_input.md5(path)
 	_size = utils_file_input.size(path)
@@ -48,7 +45,7 @@ def telnetServer():
 	remoteFileListOfMD5 = []
 	remoteFiles = {}
 
-	serverPort = 2020
+	serverPort = 2026
 	global serverSocket
 	serverSocket = socket(AF_INET, SOCK_STREAM)
 	# serverSocket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)

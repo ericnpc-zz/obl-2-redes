@@ -2,9 +2,9 @@ from socket import *
 from threading import Thread
 import utils_file_input
 import os
+import telnet
 
 error = ''
-
 
 def download(fileMD5, fileMetadata):
 	size = fileMetadata['size']
@@ -45,8 +45,9 @@ def download(fileMD5, fileMetadata):
 				final_file.write(file_data)
 
 			file_part.close()
-			os.remove(fileName + '.part' + str(i))
-			#tenemos que borrar los archivos temporales
+			utils_file_input.size(fileName + '.part' + str(i))
+			# os.remove(fileName + '.part' + str(i))
+
 		final_file.close()
 
 		md5Comparison = utils_file_input.md5(fileName) == fileMD5
@@ -70,17 +71,29 @@ def downloadViaTCP(hostIP, size, start, md5, fileName):
 	receivedFile = open(fileName,'wb')
 	dataFromServer = clientSocket.recv(4096)
 
-	response = dataFromServer.split('\n')
+	status = ''
+	if 'DOWNLOAD OK' in dataFromServer:
+		response = dataFromServer.split('DOWNLOAD OK\n')
+		status = 'DOWNLOAD OK'
+	else: 
+		response = dataFromServer.split('DOWNLOAD FAILURE\n')
+		status = 'DOWNLOAD FAILURE'
+
 	print('pa chequear noma', response)
-	if response[0] == 'DOWNLOAD FAILURE':
+	if status == 'DOWNLOAD FAILURE':
 		failureType = response[1]
 		global error
 		error = failureType
-	elif response[0] == 'DOWNLOAD OK':
+	elif status == 'DOWNLOAD OK':
+		global error
+		error = ''
 		dataFromServer = response[1]
 		while (dataFromServer):
 			receivedFile.write(dataFromServer)
 			dataFromServer = clientSocket.recv(4096)
+
+		# offer file
+		telnet.offerFile(fileName)
 
 	receivedFile.close()
 	clientSocket.close()

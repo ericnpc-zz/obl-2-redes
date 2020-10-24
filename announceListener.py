@@ -3,6 +3,7 @@ from datetime import datetime
 import fileRepository
 import announceSender
 import time
+import random
 
 BUFFER_SIZE = 65536
 
@@ -13,7 +14,7 @@ def startListening():
 	serverPort = 2020
 	global serverSocket
 	serverSocket = socket(AF_INET, SOCK_DGRAM)
-	# serverSocket.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
+	ip  = serverSocket.getsockname()[0]
 	serverSocket.bind(('', serverPort))
 
 	#Obtengo mi direccion ip local
@@ -106,6 +107,7 @@ def handleAnnouncement(message, clientAddress, serverSocket):
 
 	elif messageType == 'REQUEST':
 		#MANDAR ANNOUNCE
+		time.sleep(random.randint(0, 5))
 		announceSender.sendAnnounceMessages(serverSocket, clientAddress[0])
 
 def forceClose():
