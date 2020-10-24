@@ -38,7 +38,7 @@ def getAnnounceMessageList():
 
 
 
-def sendAnnounceMessages(socket):
+def sendAnnounceMessages(socket, ip=''):
 	if ANNOUNCE_SENDER_LOG_ENABLED:
 		print("\n///// START SENDING SCHEDULED ANNOUNCES " + str(datetime.now()) + " /////\n")
 
@@ -46,7 +46,10 @@ def sendAnnounceMessages(socket):
 			if ANNOUNCE_SENDER_LOG_ENABLED:
 				print("\n///// SENDING ANNOUNCE MESSAGE //////")
 				print(message)
-			socket.sendto(message.encode(),('<broadcast>', SERVER_PORT))
+			if ip != '':
+				socket.sendto(message.encode(),(ip, SERVER_PORT))
+			else:
+				socket.sendto(message.encode(),('<broadcast>', SERVER_PORT))
 			time.sleep(random.random())
 
 
@@ -58,9 +61,13 @@ def startSending():
 	clientSocket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1) 
 	clientSocket.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
 
+	#SEND REQUEST MESSAGE TO DISCOVER REMOTE FILES
+	message = "REQUEST\n"
+	clientSocket.sendto(message.encode(),('<broadcast>', SERVER_PORT))
+
 	while True:
-		# TODO: Es necesario que este en otro thread?
-		threading.Thread(target=sendAnnounceMessages, args=[clientSocket]).start()
+		if len(fileRepository.getLocalFiles()) > 0:
+			threading.Thread(target=sendAnnounceMessages, args=[clientSocket]).start()
 		time.sleep(30 + random.random())
 
 	clientSocket.close()

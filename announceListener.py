@@ -1,57 +1,68 @@
 from socket import *
 from datetime import datetime
 import fileRepository
+import announceSender
+import time
 
 BUFFER_SIZE = 65536
 
 global serverSocket
+shouldCheckAvailability = True
 
 def startListening():
-
 	serverPort = 2020
 	global serverSocket
 	serverSocket = socket(AF_INET, SOCK_DGRAM)
 	# serverSocket.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
 	serverSocket.bind(('', serverPort))
+
+	#Obtengo mi direccion ip local
+	s = socket(AF_INET, SOCK_DGRAM)
+	s.connect(('8.8.8.8',53))
+	myIp = s.getsockname()[0]
+	s.close()
+
 	print("El announceListener esta listo para recibir")
-
-	# announcesInProgress = {
-	# 	ip: [paquetes] # cuando se terminen se descartan - podemos usar seq_numbers y tambien timestamps y timeouts
-	# }
-
-	storedAnnounces = {}
-
-	def addAnnouncement(ip, payload):
-		if ip in storedAnnounces:
-			announceForIp = storedAnnounces[ip]
-			if not payload in announceForIp:
-				storedAnnounces[ip].append(payload)
-		else:
-			storedAnnounces[ip] = [payload]
-		print(storedAnnounces)
 
 	while True:
 		message, clientAddress = serverSocket.recvfrom(BUFFER_SIZE)
 		print('received message: ', message)
 		while message:
-			# if clientAddress
-			handleAnnouncement(message, clientAddress)
+			if clientAddress[0] != myIp:
+				handleAnnouncement(message, clientAddress, serverSocket)
 			message, clientAddress = serverSocket.recvfrom(BUFFER_SIZE)
 			print('received message within while: ', message)
 			
 		# serverSocket.sendto(message.encode(), clientAddress)
 
-def handleAnnouncement(message, clientAddress):
+def checkAvailability():
+	global shouldCheckAvailability
+	while shouldCheckAvailability:
+		_remoteFiles = fileRepository.getRemoteFiles()
+
+		for md5 in _remoteFiles.keys():
+			file = _remoteFiles[md5]
+			for host in file['hosts']:
+				if (datetime.now() - host['lastAnnounced']).seconds >= 90:
+					file['hosts'].remove(host)
+					if len(file['hosts']) == 0:
+						_remoteFiles.pop(md5)
+
+
+		fileRepository.setRemoteFiles(_remoteFiles)
+		print('checkAvailability check', _remoteFiles)
+		time.sleep(30)
+
+def handleAnnouncement(message, clientAddress, serverSocket):
 	print('----> message antes del split: ', message)
 	messageArray = message.split('\n')
 	messageType = messageArray[0]
 	print('Message Type: ', messageType)
 	messageElements = messageArray[1:]
-	messageElements.pop(len(messageElements)-1)
 	print('Message Elements: ', messageElements)
 
 	if messageType == 'ANNOUNCE':
-
+		messageElements.pop(len(messageElements)-1)
 		_remoteFiles = fileRepository.getRemoteFiles()
 		print('_remoteFiles: ', _remoteFiles)
 
@@ -88,22 +99,18 @@ def handleAnnouncement(message, clientAddress):
 					}
 					print('^^^^^^^^^^^^^^^^^',_remoteFiles)
 
-			# for md5 in _remoteFiles.keys():
-			# 	file = _remoteFiles[md5]
-			# 	for host in file['hosts']:
-			# 		if (datetime.now() - host['lastAnnounced']).seconds >= 90:
-			# 			file['hosts'].remove(host)
-
 		fileRepository.setRemoteFiles(_remoteFiles)
+		print('*********************')
+		print(fileRepository.getRemoteFiles())
+		print('*********************')
 
-		aa = fileRepository.getRemoteFiles()
-		print('Remote files updated: ', aa)
 	elif messageType == 'REQUEST':
-		print('REQUEST')
+		#MANDAR ANNOUNCE
+		message = announceSender.sendAnnounceMessages(serverSocket, clientAddress[0])
 
 def forceClose():
 	global serverSocket
 	serverSocket.close()
+	global shouldCheckAvailability
+	shouldCheckAvailability = False
 	print('Announce Listener Socket Closed')
-
-

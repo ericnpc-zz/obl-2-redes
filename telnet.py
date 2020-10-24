@@ -35,10 +35,10 @@ def listRemoteFiles():
 		fileNames = ''
 		for host in file['hosts']:
 			fileNames += host['name'] + ", "
-		fileId =+ 1
+		fileId = fileId + 1
 		fileIdtoMD5[fileId] = md5
-
 		remoteFilesString = remoteFilesString + str(fileId) + "\t" + str(file["size"]) + "\t" + fileNames + "\n"
+
 	return remoteFilesString, fileIdtoMD5
 
 def telnetServer():

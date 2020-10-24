@@ -24,6 +24,10 @@ announceListenerThread = Thread(target=announceListener.startListening)
 announceListenerThread.daemon = True
 announceListenerThread.start()
 
+checkAvailabilityThread = Thread(target=announceListener.checkAvailability)
+checkAvailabilityThread.deamon = True
+checkAvailabilityThread.start()
+
 # manejar cierre forzoso
 def signal_handler(sig, frame):
     telnet.forceClose()
