@@ -25,7 +25,7 @@ def sendFile(clientSocket):
 	else:
 		fileSize = utils_file_input.size(path)
 
-		if start + size > int(fileSize):
+		if int(start) + int(size) > int(fileSize):
 			print('*************')
 			print(fileSize)
 			print('*************')
