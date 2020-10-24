@@ -37,6 +37,7 @@ def getAnnounceMessageList():
 		print("\n///// ANNOUNCE MESSAGE COUNT IS " + str(len(announceMessages)) + " /////\n")
 	return announceMessages
 
+## TODO: Thread this?
 def sendAnnounceMessages(socket, ip=''):
 	if ANNOUNCE_SENDER_LOG_ENABLED:
 		print("\n///// START SENDING SCHEDULED ANNOUNCES " + str(datetime.now()) + " /////\n")
@@ -45,6 +46,8 @@ def sendAnnounceMessages(socket, ip=''):
 		if ANNOUNCE_SENDER_LOG_ENABLED:
 			print("\n///// SENDING ANNOUNCE MESSAGE //////")
 			print(message)
+		
+		time.sleep(random.randint(0, 5)) # TODO: 
 		if ip != '':
 			socket.sendto(message.encode(),(ip, SERVER_PORT))
 		else:

@@ -4,6 +4,7 @@ import utils_file_input
 import os
 import telnet
 
+global error
 error = ''
 
 def download(fileMD5, fileMetadata):
@@ -83,12 +84,11 @@ def downloadViaTCP(hostIP, size, start, md5, fileName):
 		status = 'DOWNLOAD FAILURE'
 
 	print('pa chequear noma', response)
+	global error
 	if status == 'DOWNLOAD FAILURE':
 		failureType = response[1]
-		global error
 		error = failureType
 	elif status == 'DOWNLOAD OK':
-		global error
 		error = ''
 		dataFromServer = response[1]
 		while (dataFromServer):

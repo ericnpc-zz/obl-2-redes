@@ -107,7 +107,6 @@ def handleAnnouncement(message, clientAddress, serverSocket):
 
 	elif messageType == 'REQUEST':
 		#MANDAR ANNOUNCE
-		time.sleep(random.randint(0, 5))
 		announceSender.sendAnnounceMessages(serverSocket, clientAddress[0])
 
 def forceClose():
