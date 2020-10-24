@@ -106,8 +106,8 @@ def handleAnnouncement(message, clientAddress, serverSocket):
 		print('*********************')
 
 	elif messageType == 'REQUEST':
-		#MANDAR ANNOUNCE
-		announceSender.sendAnnounceMessages(serverSocket, clientAddress[0])
+		# Mandamos el ANNOUNCE forzado
+		Thread(target=sendAnnounceMessages, args=[serverSocket, clientAddress[0]]).start()
 
 def forceClose():
 	global serverSocket
