@@ -30,27 +30,26 @@ def getAnnounceMessageList():
 			currentAnnounce = [file]
 		previousMessage = currentMessage
 	
-	announceMessages.append(currentMessage)
+	if currentMessage != '':
+		announceMessages.append(currentMessage)
 	
 	if ANNOUNCE_SENDER_LOG_ENABLED:
 		print("\n///// ANNOUNCE MESSAGE COUNT IS " + str(len(announceMessages)) + " /////\n")
 	return announceMessages
-
-
 
 def sendAnnounceMessages(socket, ip=''):
 	if ANNOUNCE_SENDER_LOG_ENABLED:
 		print("\n///// START SENDING SCHEDULED ANNOUNCES " + str(datetime.now()) + " /////\n")
 
 	for message in getAnnounceMessageList():
-			if ANNOUNCE_SENDER_LOG_ENABLED:
-				print("\n///// SENDING ANNOUNCE MESSAGE //////")
-				print(message)
-			if ip != '':
-				socket.sendto(message.encode(),(ip, SERVER_PORT))
-			else:
-				socket.sendto(message.encode(),('<broadcast>', SERVER_PORT))
-			time.sleep(random.random())
+		if ANNOUNCE_SENDER_LOG_ENABLED:
+			print("\n///// SENDING ANNOUNCE MESSAGE //////")
+			print(message)
+		if ip != '':
+			socket.sendto(message.encode(),(ip, SERVER_PORT))
+		else:
+			socket.sendto(message.encode(),('<broadcast>', SERVER_PORT))
+		time.sleep(random.random())
 
 
 

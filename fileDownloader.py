@@ -3,8 +3,10 @@ from threading import Thread
 import utils_file_input
 import os
 
+error = ''
 
-def prepareForDownload(fileMD5, fileMetadata): 
+
+def download(fileMD5, fileMetadata):
 	size = fileMetadata['size']
 	hosts = fileMetadata['hosts']
 	packetSize = size / len(hosts)
@@ -20,10 +22,6 @@ def prepareForDownload(fileMD5, fileMetadata):
 			size = size + packetRemain 
 		start = i * packetSize
 
-		# print(str(start) + "\n" + str(size) + "\n")
-		# print("*******")
-		# print(start, size)
-
 		t = Thread(target=downloadViaTCP, args=[host['ip'], size, start, fileMD5, fileName + '.part' + str(i)])
 		t.start()
 		threads.append(t)
@@ -31,23 +29,32 @@ def prepareForDownload(fileMD5, fileMetadata):
 	for thread in threads:
 		print('//////////////////\n Joining Thread\n/////////////////\n')
 		thread.join()
-	
-	final_file = open(fileName, 'wb')
 
-	for i in range(len(hosts)):
-		file_part = open(fileName + '.part' + str(i), 'rb')
-		file_data = file_part.read(4096)
-		final_file.write(file_data)
-		while (file_data):
+	global error
+	if error != '':
+		return False, error
+	else:
+		final_file = open(fileName, 'wb')
+
+		for i in range(len(hosts)):
+			file_part = open(fileName + '.part' + str(i), 'rb')
 			file_data = file_part.read(4096)
 			final_file.write(file_data)
+			while (file_data):
+				file_data = file_part.read(4096)
+				final_file.write(file_data)
 
-		file_part.close()
-		os.remove(fileName + '.part' + str(i))
-		#tenemos que borrar los archivos temporales
-	final_file.close()
+			file_part.close()
+			os.remove(fileName + '.part' + str(i))
+			#tenemos que borrar los archivos temporales
+		final_file.close()
 
-	print("MD5 Check: ", utils_file_input.md5(fileName) == fileMD5)
+		md5Comparison = utils_file_input.md5(fileName) == fileMD5
+		if not md5Comparison:
+			error = 'md5 check failed'
+			os.remove(fileName)
+
+		return md5Comparison, error
 
 
 def downloadViaTCP(hostIP, size, start, md5, fileName):
@@ -60,43 +67,20 @@ def downloadViaTCP(hostIP, size, start, md5, fileName):
 	downloadMessage = "DOWNLOAD\n" + md5 + "\n" + str(start) + "\n" + str(size)
 	clientSocket.send(downloadMessage.encode())
 
-	received_file = open(fileName,'wb')
-	file_data_from_server = clientSocket.recv(4096)
-	print("tamano recibido en el primer paquete",len(file_data_from_server))
-	# print('#############' + str(start))
-	# print(file_data_from_server)
-	# print('#############')
-	file_data_from_server = file_data_from_server.split('DOWNLOAD OK\n')
-	# print(file_data_from_server)
-	file_data_from_server = file_data_from_server[1]
-	while (file_data_from_server):
-		received_file.write(file_data_from_server)
-		print("before receive")
-		file_data_from_server = clientSocket.recv(4096)
-		print("tamano recibido dentro del while",len(file_data_from_server))
+	receivedFile = open(fileName,'wb')
+	dataFromServer = clientSocket.recv(4096)
 
-		print("after receive")
+	response = dataFromServer.split('\n')
+	print('pa chequear noma', response)
+	if response[0] == 'DOWNLOAD FAILURE':
+		failureType = response[1]
+		global error
+		error = failureType
+	elif response[0] == 'DOWNLOAD OK':
+		dataFromServer = response[1]
+		while (dataFromServer):
+			receivedFile.write(dataFromServer)
+			dataFromServer = clientSocket.recv(4096)
 
-
-	received_file.close()
+	receivedFile.close()
 	clientSocket.close()
-
-# remoteFiles = {}
-
-# remoteFiles['a90113d8babcbe5fc8e697a5383e83db']= {
-#         'size': 38173178,
-#         'hosts': [ 
-#         			{'ip': 'localhost',
-#                     'name': 'nombre_random.ext',
-#                     'lastAnnounced': 'fecha'
-#                     }, 
-#                     {'ip': '10.0.1.133',
-#                      'name': 'perrito.ext',
-#                      'lastAnnounced': 'fecha'
-#                     }
-#                   ]     
-# }
-
-# fileMD5 = 'a90113d8babcbe5fc8e697a5383e83db'
-# fileMetadata = remoteFiles[fileMD5]
-# prepareForDownload(fileMD5, fileMetadata)

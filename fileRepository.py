@@ -61,7 +61,10 @@ def setLocalFile(localFile):
 def getRemoteFile(md5):
     remoteFileLock.acquire()
     global remoteFiles
-    _remoteFile = remoteFiles[md5].copy()
+    if remoteFiles.has_key(md5):
+        _remoteFile = remoteFiles[md5].copy()
+    else:
+        _remoteFile = {}
     remoteFileLock.release()
     return _remoteFile
 

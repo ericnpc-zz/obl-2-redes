@@ -72,17 +72,31 @@ def telnetServer():
 				clientSocket.send(remoteFilesString)				
 
 			elif re.match("get .*", command):
+				clientSocket.send("Downloading...\n")
 				fileId = command.split('get ')[1]
 				print(remoteFileListOfMD5)
 				print(fileId)
 				print(int(fileId))
 				fileMD5 = remoteFileListOfMD5[int(fileId)]
 
-				fileDownloader.prepareForDownload(fileMD5, fileRepository.getRemoteFile(fileMD5))
-				# main.getFile(fileId)
-				# if remoteFileList
-				# manejar el caso en que la lista sea null
-				clientSocket.send("archivo descargado, chau")
+				fileMetadata = fileRepository.getRemoteFile(fileMD5)
+
+				fileMissing = False
+
+				if fileMetadata == {}:
+					downloadStatus = False
+					fileMissing = True
+				else:
+					downloadStatus, error = fileDownloader.download(fileMD5, fileMetadata)
+
+				if downloadStatus:
+					msg = "Download Success"
+				else:
+					if fileMissing:
+						msg = "File no longer available"
+					else:
+						msg = "Download Failed, try again, error: " + error
+				clientSocket.send(msg + "\n")
 
 			elif re.match("offer .*", command):
 				path = command.split('offer ')[1].replace('\\','') #agregue esto para soportar archivos con espacios en el nombre

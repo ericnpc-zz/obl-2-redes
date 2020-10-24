@@ -1,6 +1,7 @@
 from socket import *
 import threading
 import fileRepository
+import utils_file_input
 
 BUFFER_SIZE = 4096
 
@@ -18,17 +19,30 @@ def sendFile(clientSocket):
 		if file['md5'] == md5:
 			path = file['fileName']
 
-	file_to_send = open(path, 'rb')
-	file_to_send.seek(int(start))
+	if path == '':
+		missingMsg = "DOWNLOAD FAILURE\nMISSING\n"
+		clientSocket.send(missingMsg)
+	else:
+		fileSize = utils_file_input.size(path)
 
-	bytes_to_send = int(size)
-	header = "DOWNLOAD OK\n"
-	file_data = header + file_to_send.read(min(BUFFER_SIZE, bytes_to_send))
+		if start + size > int(fileSize):
+			print('*************')
+			print(fileSize)
+			print('*************')
+			badRequestMsg = "DOWNLOAD FAILURE\nBAD REQUEST\n"
+			clientSocket.send(badRequestMsg)
+		else:
+			file_to_send = open(path, 'rb')
+			file_to_send.seek(int(start))
 
-	while (file_data and bytes_to_send > 0):
-		clientSocket.send(file_data)
-		bytes_to_send = bytes_to_send - BUFFER_SIZE
-		file_data = file_to_send.read(min(BUFFER_SIZE, bytes_to_send))
+			bytes_to_send = int(size)
+			header = "DOWNLOAD OK\n"
+			file_data = header + file_to_send.read(min(BUFFER_SIZE, bytes_to_send))
+
+			while (file_data and bytes_to_send > 0):
+				clientSocket.send(file_data)
+				bytes_to_send = bytes_to_send - BUFFER_SIZE
+				file_data = file_to_send.read(min(BUFFER_SIZE, bytes_to_send))
 
 	clientSocket.close()
 
