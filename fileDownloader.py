@@ -54,6 +54,9 @@ def download(fileMD5, fileMetadata):
 		if not md5Comparison:
 			error = 'md5 check failed'
 			os.remove(fileName)
+		else:
+			# offer file
+			telnet.offerFile(fileName)
 
 		return md5Comparison, error
 
@@ -91,9 +94,6 @@ def downloadViaTCP(hostIP, size, start, md5, fileName):
 		while (dataFromServer):
 			receivedFile.write(dataFromServer)
 			dataFromServer = clientSocket.recv(4096)
-
-		# offer file
-		telnet.offerFile(fileName)
 
 	receivedFile.close()
 	clientSocket.close()
