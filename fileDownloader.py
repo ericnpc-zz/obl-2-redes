@@ -46,7 +46,7 @@ def download(fileMD5, fileMetadata):
 
 			file_part.close()
 			utils_file_input.size(fileName + '.part' + str(i))
-			# os.remove(fileName + '.part' + str(i))
+			os.remove(fileName + '.part' + str(i))
 
 		final_file.close()
 
