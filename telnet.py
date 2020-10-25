@@ -8,17 +8,21 @@ import os
 global serverSocket
 
 def offerFile(path):
-	_md5 = utils_file_input.md5(path)
-	_size = utils_file_input.size(path)
+	try:
+		_md5 = utils_file_input.md5(path)
+		_size = utils_file_input.size(path)
 
-	elem = {
-		"md5": _md5,
-		"size": _size,
-		"fileName": path
-	}
+		elem = {
+			"md5": _md5,
+			"size": _size,
+			"fileName": path
+		}
 
-	fileRepository.setLocalFile(elem)
-	return fileRepository.getLocalFiles()
+		fileRepository.setLocalFile(elem)
+		return fileRepository.getLocalFiles()
+	except:
+		return ['']
+		print('!!!!!!!!!!!!!! ERROR: ' + sys.exc_info()) 
 
 def listRemoteFiles():
 	remoteFilesString = ''
@@ -46,7 +50,7 @@ def telnetServer():
 	remoteFileListOfMD5 = {}
 	remoteFiles = {}
 
-	serverPort = 2028
+	serverPort = 2020
 	global serverSocket
 	serverSocket = socket(AF_INET, SOCK_STREAM)
 	serverSocket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1) #para poder reutilizar la address luego de cerrar el programa
@@ -84,15 +88,14 @@ def telnetServer():
 				clientSocket.send(remoteFilesString)				
 
 			elif re.match("get .*", command):
-				clientSocket.send("Downloading...\n")
 				fileId = command.split('get ')[1]
 				print(remoteFileListOfMD5)
 				print(fileId)
 				print(int(fileId))
 				
-				fileMD5 = remoteFileListOfMD5[int(fileId)]
-				
-				if fileMD5 != '':
+				if remoteFileListOfMD5.has_key(int(fileId)):
+					clientSocket.send("Downloading...\n")
+					fileMD5 = remoteFileListOfMD5[int(fileId)]
 
 					fileMetadata = fileRepository.getRemoteFile(fileMD5)
 
@@ -118,7 +121,10 @@ def telnetServer():
 			elif re.match("offer .*", command):
 				path = command.split('offer ')[1].replace('\\','') #agregue esto para soportar archivos con espacios en el nombre
 				l = offerFile(path)
-				clientSocket.send("File offered successfully\n")
+				if l == ['']:
+					clientSocket.send("Please enter a valid path\n")
+				else:
+					clientSocket.send("File offered successfully\n")
 
 			elif command == LIST_OFFERED:
 				localFiles = fileRepository.getLocalFiles()
@@ -128,7 +134,7 @@ def telnetServer():
 						localFilesString += 'FILES CURRENTLY BEING OFFERED: \n\nName\tSize\tMD5\n'
 						localFilesString += file['fileName'] + '\t' + str(file['size']) + '\t' + file['md5'] + '\n'
 				else:
-					localFilesString = 'NO FILES BEING OFFERED\n\n'
+					localFilesString = 'NO FILES ARE BEING OFFERED\n\n'
 				clientSocket.send(localFilesString)
 				
 			elif command == COMMAND_EXIT:

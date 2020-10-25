@@ -46,7 +46,7 @@ def sendFile(clientSocket):
 					bytes_to_send = bytes_to_send - BUFFER_SIZE
 					file_data = file_to_send.read(min(BUFFER_SIZE, bytes_to_send))
 			except:
-				print('!!!!!!!!!!!!!! ERROR: ' + sys.exc_info()[0]) 
+				print('!!!!!!!!!!!!!! ERROR: ' + sys.exc_info()) 
 
 
 	clientSocket.close()
