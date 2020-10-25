@@ -92,6 +92,7 @@ def downloadViaTCP(hostIP, size, start, md5, fileName):
 		error = ''
 		dataFromServer = response[1]
 		while (dataFromServer):
+			print('==================================RECIBIENDO===================================')
 			receivedFile.write(dataFromServer)
 			dataFromServer = clientSocket.recv(4096)
 

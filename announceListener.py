@@ -4,6 +4,7 @@ import fileRepository
 import announceSender
 import time
 import random
+from threading import Thread
 
 BUFFER_SIZE = 65536
 
@@ -107,7 +108,7 @@ def handleAnnouncement(message, clientAddress, serverSocket):
 
 	elif messageType == 'REQUEST':
 		# Mandamos el ANNOUNCE forzado
-		Thread(target=sendAnnounceMessages, args=[serverSocket, clientAddress[0]]).start()
+		Thread(target=announceSender.sendAnnounceMessages, args=[serverSocket, clientAddress[0]]).start()
 
 def forceClose():
 	global serverSocket

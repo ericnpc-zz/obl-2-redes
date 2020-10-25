@@ -2,6 +2,7 @@ from socket import *
 import threading
 import fileRepository
 import utils_file_input
+import sys
 
 BUFFER_SIZE = 4096
 
@@ -37,12 +38,16 @@ def sendFile(clientSocket):
 
 			bytes_to_send = int(size)
 			header = "DOWNLOAD OK\n"
-			file_data = header + file_to_send.read(min(BUFFER_SIZE, bytes_to_send))
+			try: 
+				file_data = header + file_to_send.read(min(BUFFER_SIZE, bytes_to_send))
 
-			while (file_data and bytes_to_send > 0):
-				clientSocket.send(file_data)
-				bytes_to_send = bytes_to_send - BUFFER_SIZE
-				file_data = file_to_send.read(min(BUFFER_SIZE, bytes_to_send))
+				while (file_data and bytes_to_send > 0):
+					clientSocket.send(file_data)
+					bytes_to_send = bytes_to_send - BUFFER_SIZE
+					file_data = file_to_send.read(min(BUFFER_SIZE, bytes_to_send))
+			except:
+				print('!!!!!!!!!!!!!! ERROR: ' + sys.exc_info()[0]) 
+
 
 	clientSocket.close()
 

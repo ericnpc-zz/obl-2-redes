@@ -41,14 +41,15 @@ def listRemoteFiles():
 def telnetServer():
 	COMMAND_EXIT = 'exit'
 	COMMAND_LIST = 'list'
+	LIST_OFFERED = 'list offered'
 
 	remoteFileListOfMD5 = []
 	remoteFiles = {}
 
-	serverPort = 2027
+	serverPort = 2028
 	global serverSocket
 	serverSocket = socket(AF_INET, SOCK_STREAM)
-	# serverSocket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
+	serverSocket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1) #para poder reutilizar la address luego de cerrar el programa
 
 	serverSocket.bind(('', serverPort))
 	# string vacio porque https://stackoverflow.com/questions/16130786/why-am-i-getting-the-error-connection-refused-in-python-sockets/16130819
@@ -58,6 +59,16 @@ def telnetServer():
 
 	while True:
 		clientSocket, addr = serverSocket.accept()
+
+		welcomeMessage = '\n\nCOMMANDS AVAILABLE:\n\n'
+		welcomeMessage = welcomeMessage + '- list \t(will list files available for download)\n'
+		welcomeMessage = welcomeMessage + '- get <id> (will download the remote file with the specified id)\n'
+		welcomeMessage = welcomeMessage + '- list offered (will list files offered by you)\n'
+		welcomeMessage = welcomeMessage + '- offer <path> (will offer the file specified in <path>)\n'
+		welcomeMessage = welcomeMessage + '- exit \t(will close the program)\n\n'
+
+		clientSocket.send(welcomeMessage)
+
 		exit = False
 		while not exit: 
 			command = clientSocket.recv(2048).decode().strip().lower()
@@ -66,6 +77,8 @@ def telnetServer():
 			if command == COMMAND_LIST:
 				remoteFilesString, remoteFileListOfMD5 = listRemoteFiles()
 				print(remoteFileListOfMD5)
+				if remoteFilesString != '':
+					remoteFilesString = 'FILES AVAILABLE:\n\nId\tSize\t\tNames\n' + remoteFilesString
 				clientSocket.send(remoteFilesString)				
 
 			elif re.match("get .*", command):
@@ -100,8 +113,16 @@ def telnetServer():
 				l = offerFile(path)
 				clientSocket.send("File offered successfully\n")
 
+			elif command == LIST_OFFERED:
+				localFiles = fileRepository.getLocalFiles()
+				localFilesString = ''
+				for file in localFiles:
+					localFilesString += 'FILES CURRENTLY BEING OFFERED: \n\nName\tSize\tMD5\n'
+					localFilesString += file['fileName'] + '\t' + str(file['size']) + '\t' + file['md5'] + '\n'
+				clientSocket.send(localFilesString)
+				
 			elif command == COMMAND_EXIT:
-				print('bye')
+				print('Bye!\n\n')
 				# clientSocket.send(addr + ' ')
 				clientSocket.close()
 				# serverSocket.close()		TODO: esto va, no?
