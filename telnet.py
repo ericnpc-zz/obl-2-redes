@@ -1,5 +1,5 @@
 from socket import *
-import utils_file_input
+import utils
 import re
 import fileDownloader
 import fileRepository
@@ -7,10 +7,11 @@ import os
 
 global serverSocket
 
+# Agrega a la lista global localFiles el archivo ofrecido
 def offerFile(path):
 	try:
-		_md5 = utils_file_input.md5(path)
-		_size = utils_file_input.size(path)
+		_md5 = utils.md5(path)
+		_size = utils.size(path)
 
 		elem = {
 			"md5": _md5,
@@ -22,8 +23,10 @@ def offerFile(path):
 		return fileRepository.getLocalFiles()
 	except:
 		return ['']
-		print('!!!!!!!!!!!!!! ERROR: ' + sys.exc_info()) 
+		print('[telnet.offerFile] An error occurred: ' + sys.exc_info() + '\n')
 
+# Lista el contenido del diccionario global remoteFiles y una estructura
+# que mapea el fileId amigable con su md5.
 def listRemoteFiles():
 	remoteFilesString = ''
 	fileId = 0
@@ -42,6 +45,8 @@ def listRemoteFiles():
 
 	return remoteFilesString, fileIdtoMD5
 
+# Esta funcion va a ser llamada desde un thread que se inicia desde el programa
+# principal. Escucha permanentemente los comandos enviados por el usuario que establecio la conexion via telnet.
 def telnetServer():
 	COMMAND_EXIT = 'exit'
 	COMMAND_LIST = 'list'
@@ -50,16 +55,16 @@ def telnetServer():
 	remoteFileListOfMD5 = {}
 	remoteFiles = {}
 
-	serverPort = 2020
+	serverPort = 2025
 	global serverSocket
 	serverSocket = socket(AF_INET, SOCK_STREAM)
 	serverSocket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1) #para poder reutilizar la address luego de cerrar el programa
 
 	serverSocket.bind(('', serverPort))
 	# string vacio porque https://stackoverflow.com/questions/16130786/why-am-i-getting-the-error-connection-refused-in-python-sockets/16130819
-	serverSocket.listen(0)
+	serverSocket.listen(1)
 
-	print('The telnet server is ready to receive commands')
+	print('[telnet.telnetServer] El servidor de telnet esta listo para recibir comandos\n')
 
 	while True:
 		clientSocket, addr = serverSocket.accept()
@@ -119,7 +124,7 @@ def telnetServer():
 					clientSocket.send("Please enter a valid id\n\n")
 
 			elif re.match("offer .*", command):
-				path = command.split('offer ')[1].replace('\\','') #agregue esto para soportar archivos con espacios en el nombre
+				path = command.split('offer ')[1].replace('\\','')
 				l = offerFile(path)
 				if l == ['']:
 					clientSocket.send("Please enter a valid path\n")
@@ -142,8 +147,7 @@ def telnetServer():
 				clientSocket.close()
 				exit = True
 
-# TODO: Borrar si no sirve - junto con los globals
 def forceClose():
 	global serverSocket
 	serverSocket.close()
-	print('Telnet Socket Closed')
+	print('[fileSender.forceClose] Telnet Socket Closed\n')

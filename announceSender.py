@@ -1,65 +1,66 @@
 from socket import *
-import utils_file_input
+from datetime import datetime
+import utils
 import time
 import random
 import sys
 import fileRepository
 import threading
-from datetime import datetime
 
 SERVER_PORT = 2020
-ANNOUNCE_SENDER_LOG_ENABLED = False
-MAXIMUM_ANNOUNCE_SIZE = 1450 
-# TODO: Agregar fuentes e investigar por que
-# TODO: Esperando respuesta de Mati
+MAXIMUM_ANNOUNCE_SIZE = 1450
 
 
+# Genera uno o mas mensajes de ANNOUNCE (dependiendo del tamano del mensaje) utilizando la lista
+# de local files que el host ofrece
 def getAnnounceMessageList():
 	announceMessages = []
-	currentAnnounce = []
+	currentFileList = []
 	previousMessage = ''
 	currentMessage = ''
 
 	# dividimos los announces para controlar que pesen menos que el Maximum Announce Size 
 	# cuando vemos que no entra ninguno mas, creamos un announce nuevo y damos por finalizado el actual
 	for file in fileRepository.getLocalFiles():
-		currentAnnounce.append(file)
-		currentMessage = utils_file_input.formatAnnounceList(currentAnnounce)
+		currentFileList.append(file)
+		currentMessage = utils.formatAnnounceList(currentFileList)
+
 		if sys.getsizeof(currentMessage) > MAXIMUM_ANNOUNCE_SIZE:
 			announceMessages.append(previousMessage)
-			currentAnnounce = [file]
+			currentFileList = [file]
+
 		previousMessage = currentMessage
 	
 	if currentMessage != '':
 		announceMessages.append(currentMessage)
 	
-	if ANNOUNCE_SENDER_LOG_ENABLED:
-		print("\n///// ANNOUNCE MESSAGE COUNT IS " + str(len(announceMessages)) + " /////\n")
+	print("[announceSender.getAnnounceMessageList] ANNOUNCE MESSAGE COUNT IS " + str(len(announceMessages)) + "\n")
+	
 	return announceMessages
 
+# Se encarga de enviar los ANNOUNCE tanto en broadcast como unicast
+# Si ip = '' mandamos en broadcast, si no, mandamos a ese ip
 def sendAnnounceMessages(socket, ip=''):
-	if ANNOUNCE_SENDER_LOG_ENABLED:
-		print("\n///// START SENDING SCHEDULED ANNOUNCES " + str(datetime.now()) + " /////\n")
+
+	print("[announceSender.sendAnnounceMessages] Start sending scheduled announces " + str(datetime.now()) + "\n")
 
 	for message in getAnnounceMessageList():
-		if ANNOUNCE_SENDER_LOG_ENABLED:
-			print("\n///// SENDING ANNOUNCE MESSAGE //////")
-			print(message)
-		
+		# Si el announce es unicast
 		if ip != '':
 			# espera aleatoria de hasta 5 segundos
-			time.sleep(random.randint(0, 5))
+			time.sleep(random.uniform(0, 5))
 			socket.sendto(message.encode(),(ip, SERVER_PORT))
 		else:
 			socket.sendto(message.encode(),('<broadcast>', SERVER_PORT))
-		time.sleep(random.random())
+			time.sleep(random.uniform(0.5, 1))
 
-
-
+# Esta funcion va a ser llamada desde un thread que se inicia junto con el programa
+# principal. Envia permanentemente (cada 30 segundos mas un tiempo aleatorio) 
+# mensajes de tipo ANNOUNCE y REQUEST.
 def startSending(): 
 	global clientSocket
 	clientSocket = socket(AF_INET, SOCK_DGRAM)
-	# https://stackoverflow.com/questions/14388706/how-do-so-reuseaddr-and-so-reuseport-differ
+	# https://man7.org/linux/man-pages/man7/socket.7.html
 	clientSocket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1) 
 	clientSocket.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
 
@@ -70,11 +71,10 @@ def startSending():
 	while True:
 		if len(fileRepository.getLocalFiles()) > 0:
 			threading.Thread(target=sendAnnounceMessages, args=[clientSocket]).start()
-		time.sleep(30 + random.random())
+		time.sleep(30 + random.uniform(0, 1))
 
-	clientSocket.close()
 
 def forceClose():
 	global clientSocket
 	clientSocket.close()
-	print('Announce Sender Socket Closed')
+	print('[announceSender.forceClose] Announce Sender Socket Closed')

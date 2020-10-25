@@ -1,16 +1,18 @@
 from socket import *
 from datetime import datetime
+from threading import Thread
 import fileRepository
 import announceSender
 import time
 import random
-from threading import Thread
 
 BUFFER_SIZE = 65536
 
 global serverSocket
 shouldCheckAvailability = True
 
+# Esta funcion va a ser llamada desde el thread que se inicia junto con el programa
+# principal. Escucha permanentemente mensajes de tipo ANNOUNCE y REQUEST.
 def startListening():
 	serverPort = 2020
 	global serverSocket
@@ -18,55 +20,38 @@ def startListening():
 	ip  = serverSocket.getsockname()[0]
 	serverSocket.bind(('', serverPort))
 
-	#Obtengo mi direccion ip local
+	# Obtengo mi direccion ip local 
+	# para ignorar mis propios anuncios
 	s = socket(AF_INET, SOCK_DGRAM)
 	s.connect(('8.8.8.8',53))
 	myIp = s.getsockname()[0]
 	s.close()
 
-	print("El announceListener esta listo para recibir")
+	print("[announceListener.startListening] El announceListener esta listo para recibir\n")
 
 	while True:
 		message, clientAddress = serverSocket.recvfrom(BUFFER_SIZE)
-		print('received message: ', message)
 		while message:
 			if clientAddress[0] != myIp:
 				handleAnnouncement(message, clientAddress, serverSocket)
 			message, clientAddress = serverSocket.recvfrom(BUFFER_SIZE)
-			print('received message within while: ', message)
 			
-		# serverSocket.sendto(message.encode(), clientAddress)
 
-def checkAvailability():
-	global shouldCheckAvailability
-	while shouldCheckAvailability:
-		_remoteFiles = fileRepository.getRemoteFiles()
-
-		for md5 in _remoteFiles.keys():
-			file = _remoteFiles[md5]
-			for host in file['hosts']:
-				if (datetime.now() - host['lastAnnounced']).seconds >= 90:
-					file['hosts'].remove(host)
-					if len(file['hosts']) == 0:
-						_remoteFiles.pop(md5)
-
-
-		fileRepository.setRemoteFiles(_remoteFiles)
-		print('checkAvailability check', _remoteFiles)
-		time.sleep(30)
-
+# Procesa los mensajes recibidos dentro de la funcion startListening. 
+# En caso de ser ANNOUNCEs, actualiza la lista de remotes files y de ser REQUEST
+# se envia un mensaje ANNOUNCE forzadamente al host que lo solicito.
 def handleAnnouncement(message, clientAddress, serverSocket):
-	print('----> message antes del split: ', message)
+
 	messageArray = message.split('\n')
 	messageType = messageArray[0]
-	print('Message Type: ', messageType)
+	print('[announceListener.handleAnnouncement] Message Type: ', messageType)
 	messageElements = messageArray[1:]
-	print('Message Elements: ', messageElements)
 
 	if messageType == 'ANNOUNCE':
 		messageElements.pop(len(messageElements)-1)
+		print('[announceListener.handleAnnouncement] Announce Message Elements: ', messageElements)
+
 		_remoteFiles = fileRepository.getRemoteFiles()
-		print('_remoteFiles: ', _remoteFiles)
 
 		if len(messageElements) > 0:
 			for elem in messageElements:
@@ -99,20 +84,38 @@ def handleAnnouncement(message, clientAddress, serverSocket):
 							'lastAnnounced': datetime.now()
 						}]
 					}
-					print('^^^^^^^^^^^^^^^^^',_remoteFiles)
 
 		fileRepository.setRemoteFiles(_remoteFiles)
-		print('*********************')
-		print(fileRepository.getRemoteFiles())
-		print('*********************')
 
 	elif messageType == 'REQUEST':
 		# Mandamos el ANNOUNCE forzado
 		Thread(target=announceSender.sendAnnounceMessages, args=[serverSocket, clientAddress[0]]).start()
 
+# Esta funcion va a correr permanentemente en un thread abierto desde el programa principal
+# Corrobora los time stamps de cada archivo ofrecido por cada host para quitar de la lista
+# aquellos que hayan sido ofrecidos por ultima vez hace mas de 90 segundos.
+def checkAvailability():
+	global shouldCheckAvailability
+	while shouldCheckAvailability:
+		_remoteFiles = fileRepository.getRemoteFiles()
+
+		for md5 in _remoteFiles.keys():
+			file = _remoteFiles[md5]
+			for host in file['hosts']:
+				if (datetime.now() - host['lastAnnounced']).seconds >= 90:
+					file['hosts'].remove(host)
+					if len(file['hosts']) == 0:
+						_remoteFiles.pop(md5)
+
+
+		fileRepository.setRemoteFiles(_remoteFiles)
+		print('[announceListener.checkAvailability] Availability check', _remoteFiles)
+		time.sleep(30)
+
+# Cierra sockets y evita la continuacion de las tareas en caso de haber ocurrido un ctrl+c.
 def forceClose():
 	global serverSocket
 	serverSocket.close()
 	global shouldCheckAvailability
 	shouldCheckAvailability = False
-	print('Announce Listener Socket Closed')
+	print('[announceListener.forceClose] Announce Listener Socket Closed')

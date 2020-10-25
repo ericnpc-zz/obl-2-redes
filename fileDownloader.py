@@ -1,12 +1,18 @@
 from socket import *
 from threading import Thread
-import utils_file_input
+import utils
 import os
 import telnet
 
 global error
 error = ''
 
+# Procesa la solicitud de descarga del archivo, a partir de la metadata del mismo. 
+# Decide la distribucion de descarga entre los hosts (si mas de uno lo esta ofreciendo)
+# abriendo un thread para realizar la descarga desde cada uno. 
+# Guardamos cada parte del archivo en disco, para luego de finalizada cada descarga juntar
+# las partes en el archivo final. 
+# Las partes del archivo son eliminadas del disco luego de finalizada la transaccion.
 def download(fileMD5, fileMetadata):
 	size = fileMetadata['size']
 	hosts = fileMetadata['hosts']
@@ -23,12 +29,11 @@ def download(fileMD5, fileMetadata):
 			size = size + packetRemain 
 		start = i * packetSize
 
-		t = Thread(target=downloadViaTCP, args=[host['ip'], size, start, fileMD5, fileName + '.part' + str(i)])
+		t = Thread(target=downloadFromSingleHost, args=[host['ip'], size, start, fileMD5, fileName + '.part' + str(i)])
 		t.start()
 		threads.append(t)
 	
 	for thread in threads:
-		print('//////////////////\n Joining Thread\n/////////////////\n')
 		thread.join()
 
 	global error
@@ -46,12 +51,12 @@ def download(fileMD5, fileMetadata):
 				final_file.write(file_data)
 
 			file_part.close()
-			utils_file_input.size(fileName + '.part' + str(i))
+			utils.size(fileName + '.part' + str(i))
 			os.remove(fileName + '.part' + str(i))
 
 		final_file.close()
 
-		md5Comparison = utils_file_input.md5(fileName) == fileMD5
+		md5Comparison = utils.md5(fileName) == fileMD5
 		if not md5Comparison:
 			error = 'md5 check failed'
 			os.remove(fileName)
@@ -61,18 +66,18 @@ def download(fileMD5, fileMetadata):
 
 		return md5Comparison, error
 
+# Se encarga de establecer la conexion TCP con el host indicado
+# para realizar la descarga del archivo solicitado
+def downloadFromSingleHost(hostIP, size, start, md5, fileName):
+	print('[fileDownloader.downloadFromSingleHost] Downloading from Host: ' + str(hostIP))
 
-def downloadViaTCP(hostIP, size, start, md5, fileName):
-	print('//////////////////\n' + 'Downloading from ' + str(hostIP) + '\n//////////////////\n\n')
-    
-	serverPort = 2030
+	serverPort = 2020
 	clientSocket = socket(AF_INET, SOCK_STREAM)
 	clientSocket.connect((hostIP, serverPort))
 
 	downloadMessage = "DOWNLOAD\n" + md5 + "\n" + str(start) + "\n" + str(size)
 	clientSocket.send(downloadMessage.encode())
 
-	receivedFile = open(fileName,'wb')
 	dataFromServer = clientSocket.recv(4096)
 
 	status = ''
@@ -83,18 +88,22 @@ def downloadViaTCP(hostIP, size, start, md5, fileName):
 		response = dataFromServer.split('DOWNLOAD FAILURE\n')
 		status = 'DOWNLOAD FAILURE'
 
-	print('pa chequear noma', response)
+	print('[fileDownloader.downloadFromSingleHost] Download status: ', status)
 	global error
 	if status == 'DOWNLOAD FAILURE':
 		failureType = response[1]
 		error = failureType
 	elif status == 'DOWNLOAD OK':
+		receivedFile = open(fileName,'wb')
 		error = ''
+		
 		dataFromServer = response[1]
 		while (dataFromServer):
-			print('==================================RECIBIENDO===================================')
 			receivedFile.write(dataFromServer)
 			dataFromServer = clientSocket.recv(4096)
+		
+		receivedFile.close()
 
-	receivedFile.close()
+	print('[fileDownloader.downloadFromSingleHost] Finished downloading from host: ' + str(hostIP) + '. Joining thread')
+
 	clientSocket.close()

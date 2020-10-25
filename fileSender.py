@@ -1,16 +1,18 @@
 from socket import *
 import threading
 import fileRepository
-import utils_file_input
+import utils
 import sys
 
 BUFFER_SIZE = 4096
 
+# Este metodo se encarga de enviar el archivo solicitado, la cantidad de bytes y  
+# desplazamiento indicados dentro del mensaje de solicitud de descarga. 
 def sendFile(clientSocket):
 	messageFromDownloader = clientSocket.recv(4096)
 	messageFromDownloader = messageFromDownloader.split('\n')[1:]
 
-	print(messageFromDownloader)
+	print('[fileSender.sendFile] Download request message: ' + messageFromDownloader + '\n')
 
 	md5, start, size = messageFromDownloader
 
@@ -24,43 +26,42 @@ def sendFile(clientSocket):
 		missingMsg = "DOWNLOAD FAILURE\nMISSING\n"
 		clientSocket.send(missingMsg)
 	else:
-		fileSize = utils_file_input.size(path)
+		fileSize = utils.size(path)
 
 		if int(start) + int(size) > int(fileSize):
-			print('*************')
-			print(fileSize)
-			print('*************')
 			badRequestMsg = "DOWNLOAD FAILURE\nBAD REQUEST\n"
 			clientSocket.send(badRequestMsg)
 		else:
-			file_to_send = open(path, 'rb')
-			file_to_send.seek(int(start))
+			fileToSend = open(path, 'rb')
+			fileToSend.seek(int(start))
 
-			bytes_to_send = int(size)
+			bytesToSend = int(size)
 			header = "DOWNLOAD OK\n"
 			try: 
-				file_data = header + file_to_send.read(min(BUFFER_SIZE, bytes_to_send))
+				fileData = header + fileToSend.read(min(BUFFER_SIZE, bytesToSend))
 
-				while (file_data and bytes_to_send > 0):
-					clientSocket.send(file_data)
-					bytes_to_send = bytes_to_send - BUFFER_SIZE
-					file_data = file_to_send.read(min(BUFFER_SIZE, bytes_to_send))
+				while (fileData and bytesToSend > 0):
+					clientSocket.send(fileData)
+					bytesToSend = bytesToSend - BUFFER_SIZE
+					fileData = fileToSend.read(min(BUFFER_SIZE, bytesToSend))
 			except:
-				print('!!!!!!!!!!!!!! ERROR: ' + sys.exc_info()) 
-
+				print('[fileSender.sendFile] An error occurred: ' + sys.exc_info() + '\n')
 
 	clientSocket.close()
 
+# Esta funcion va a ser llamada desde un thread que se inicia junto con el programa
+# principal. Escucha permanentemente mensajes de tipo DOWNLOAD, abriendo un thread por cada
+# conexion establecida para realizar la descarga.
 def startListening():
-	serverPort = 2030
+	serverPort = 2020
 	serverSocket = socket(AF_INET, SOCK_STREAM)
 	serverSocket.bind(('', serverPort))
 	serverSocket.listen(1)
 
-	print('El servidor esta listo para recibir pedidos')
+	print('[fileSender.startListening] El servidor de descargas esta listo para recibir pedidos\n')
 
 	while True: 
 		clientSocket, addr = serverSocket.accept()
-		print('conexion aceptada')
+		print('[fileSender.startListening] Conexion aceptada para el host: ' + addr[0] + '\n')
 		t = threading.Thread(target=sendFile, args=[clientSocket])
 		t.start()

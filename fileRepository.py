@@ -8,6 +8,9 @@
 # Modules are singletons in Python because import only creates a single copy of each module
 # https://python-patterns.guide/gang-of-four/singleton/
 
+# La responsabilidad de este modulo es mantener las estructuras globales de archivos 
+# locales y remotos.
+
 from threading import Thread, Lock
 from datetime import datetime
 
@@ -15,35 +18,38 @@ remoteFiles = {}
 localFiles = []
 
 # Ejemplo de LocalFiles:
-# for i in range(150):
-#     localFiles.append({
-#         'fileName': 'Nombre.ext',
-#         'size': i,
-#         'md5': 'MD5'
-#     })
+# localFiles = [
+# {
+#     'fileName': 'File1.ext',
+#     'size': 34252343,
+#     'md5': 'MD5file1'
+# },
+# {
+#     'fileName': 'File2.ext',
+#     'size': 55867633,
+#     'md5': 'MD5file2'
+# }
+# ]
 
-# remoteFiles['hdaksehqi378437n73qkay3874q']= {
+# Ejemplo de remoteFiles
+# remoteFiles = {
+#   'md5file1': 
+#      {
 #         'size': 38173178,
-#         'hosts': [ {'ip': 'localhost',
-#                     'name': 'archivo_descargado.txt',
-#                     'lastAnnounced': datetime.now()
-#                     # }, 
-#                     # {'ip': '10.0.1.133',
-#                     #   'name': 'perrito.ext',
-#                     #  'lastAnnounced': datetime.now()
+#         'hosts': [ {'ip': '192.168.1.23',
+#                     'name': 'fileOfrecidoPorHost1.txt',
+#                     'lastAnnounced': lastTimeAnnounced
+#                     }, 
+#                     {'ip': '10.0.1.133',
+#                      'name': 'fileOfrecidoPorHost2.ext',
+#                      'lastAnnounced': lastTimeAnnounced
 #                     }
-#                   ]        
+#                   ]   
+#       }  
 # }
 
 localFileLock = Lock()
 remoteFileLock = Lock()
-
-def getLocalFile(index):
-    localFileLock.acquire()
-    global localFiles
-    _localFile = localFiles[index].copy()
-    localFileLock.release()
-    return _localFile
 
 def getLocalFiles():
     localFileLock.acquire()
@@ -80,10 +86,4 @@ def setRemoteFiles(value):
     remoteFileLock.acquire()
     global remoteFiles
     remoteFiles = value.copy()
-    remoteFileLock.release()
-
-def deleteRemoteFile(md5):
-    remoteFileLock.acquire()
-    global remoteFiles
-    remoteFiles.pop(md5)
     remoteFileLock.release()
