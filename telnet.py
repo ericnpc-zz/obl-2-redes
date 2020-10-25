@@ -79,6 +79,8 @@ def telnetServer():
 				print(remoteFileListOfMD5)
 				if remoteFilesString != '':
 					remoteFilesString = 'FILES AVAILABLE:\n\nId\tSize\t\tNames\n' + remoteFilesString
+				else: 
+					remoteFilesString = 'NO FILES AVAILABLE\n\n'
 				clientSocket.send(remoteFilesString)				
 
 			elif re.match("get .*", command):
@@ -87,26 +89,29 @@ def telnetServer():
 				print(remoteFileListOfMD5)
 				print(fileId)
 				print(int(fileId))
-				fileMD5 = remoteFileListOfMD5[int(fileId)]
+				if remoteFileListOfMD5.has_key(fileId):
+					fileMD5 = remoteFileListOfMD5[int(fileId)]
 
-				fileMetadata = fileRepository.getRemoteFile(fileMD5)
+					fileMetadata = fileRepository.getRemoteFile(fileMD5)
 
-				fileMissing = False
+					fileMissing = False
 
-				if fileMetadata == {}:
-					downloadStatus = False
-					fileMissing = True
-				else:
-					downloadStatus, error = fileDownloader.download(fileMD5, fileMetadata)
-
-				if downloadStatus:
-					msg = "Download Success"
-				else:
-					if fileMissing:
-						msg = "File no longer available"
+					if fileMetadata == {}:
+						downloadStatus = False
+						fileMissing = True
 					else:
-						msg = "Download Failed, try again, error: " + error
-				clientSocket.send(msg + "\n")
+						downloadStatus, error = fileDownloader.download(fileMD5, fileMetadata)
+
+					if downloadStatus:
+						msg = "Download Success"
+					else:
+						if fileMissing:
+							msg = "File no longer available"
+						else:
+							msg = "Download Failed, try again, error: " + error
+					clientSocket.send(msg + "\n")
+				else:
+					clientSocket.send("Please enter a valid id\n\n")
 
 			elif re.match("offer .*", command):
 				path = command.split('offer ')[1].replace('\\','') #agregue esto para soportar archivos con espacios en el nombre
@@ -116,16 +121,17 @@ def telnetServer():
 			elif command == LIST_OFFERED:
 				localFiles = fileRepository.getLocalFiles()
 				localFilesString = ''
-				for file in localFiles:
-					localFilesString += 'FILES CURRENTLY BEING OFFERED: \n\nName\tSize\tMD5\n'
-					localFilesString += file['fileName'] + '\t' + str(file['size']) + '\t' + file['md5'] + '\n'
+				if len(localFiles) > 0:
+					for file in localFiles:
+						localFilesString += 'FILES CURRENTLY BEING OFFERED: \n\nName\tSize\tMD5\n'
+						localFilesString += file['fileName'] + '\t' + str(file['size']) + '\t' + file['md5'] + '\n'
+				else:
+					localFilesString = 'NO FILES BEING OFFERED\n\n'
 				clientSocket.send(localFilesString)
 				
 			elif command == COMMAND_EXIT:
-				print('Bye!\n\n')
-				# clientSocket.send(addr + ' ')
+				print('Closing connection. Bye!\n\n')
 				clientSocket.close()
-				# serverSocket.close()		TODO: esto va, no?
 				exit = True
 
 # TODO: Borrar si no sirve - junto con los globals
