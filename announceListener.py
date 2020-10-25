@@ -44,12 +44,12 @@ def handleAnnouncement(message, clientAddress, serverSocket):
 
 	messageArray = message.split('\n')
 	messageType = messageArray[0]
-	print('[announceListener.handleAnnouncement] Message Type: ', messageType)
+	print('[announceListener.handleAnnouncement] Message Type: ', messageType + '\n')
 	messageElements = messageArray[1:]
 
 	if messageType == 'ANNOUNCE':
 		messageElements.pop(len(messageElements)-1)
-		print('[announceListener.handleAnnouncement] Announce Message Elements: ', messageElements)
+		print('[announceListener.handleAnnouncement] Announce Message Elements: ', messageElements + '\n')
 
 		_remoteFiles = fileRepository.getRemoteFiles()
 
@@ -109,7 +109,7 @@ def checkAvailability():
 
 
 		fileRepository.setRemoteFiles(_remoteFiles)
-		print('[announceListener.checkAvailability] Availability check', _remoteFiles)
+		print('[announceListener.checkAvailability] Availability check', _remoteFiles + '\n')
 		time.sleep(30)
 
 # Cierra sockets y evita la continuacion de las tareas en caso de haber ocurrido un ctrl+c.
@@ -118,4 +118,4 @@ def forceClose():
 	serverSocket.close()
 	global shouldCheckAvailability
 	shouldCheckAvailability = False
-	print('[announceListener.forceClose] Announce Listener Socket Closed')
+	print('[announceListener.forceClose] Announce Listener Socket Closed\n')

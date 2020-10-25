@@ -81,11 +81,10 @@ def telnetServer():
 		exit = False
 		while not exit: 
 			command = clientSocket.recv(2048).decode().strip().lower()
-			print(command)
 
 			if command == COMMAND_LIST:
 				remoteFilesString, remoteFileListOfMD5 = listRemoteFiles()
-				print(remoteFileListOfMD5)
+
 				if remoteFilesString != '':
 					remoteFilesString = 'FILES AVAILABLE:\n\nId\tSize\t\tNames\n' + remoteFilesString
 				else: 
@@ -94,9 +93,6 @@ def telnetServer():
 
 			elif re.match("get .*", command):
 				fileId = command.split('get ')[1]
-				print(remoteFileListOfMD5)
-				print(fileId)
-				print(int(fileId))
 				
 				if remoteFileListOfMD5.has_key(int(fileId)):
 					clientSocket.send("Downloading...\n")

@@ -42,7 +42,7 @@ def signal_handler(sig, frame):
     telnet.forceClose()
     announceListener.forceClose()
     announceSender.forceClose()
-    print('Exiting the program now')
+    print('Exiting the program now\n')
     sys.exit(0)
 signal.signal(signal.SIGINT, signal_handler)
 signal.pause()

@@ -69,7 +69,7 @@ def download(fileMD5, fileMetadata):
 # Se encarga de establecer la conexion TCP con el host indicado
 # para realizar la descarga del archivo solicitado
 def downloadFromSingleHost(hostIP, size, start, md5, fileName):
-	print('[fileDownloader.downloadFromSingleHost] Downloading from Host: ' + str(hostIP))
+	print('[fileDownloader.downloadFromSingleHost] Downloading from Host: ' + str(hostIP) + '\n')
 
 	serverPort = 2020
 	clientSocket = socket(AF_INET, SOCK_STREAM)
@@ -88,7 +88,7 @@ def downloadFromSingleHost(hostIP, size, start, md5, fileName):
 		response = dataFromServer.split('DOWNLOAD FAILURE\n')
 		status = 'DOWNLOAD FAILURE'
 
-	print('[fileDownloader.downloadFromSingleHost] Download status: ', status)
+	print('[fileDownloader.downloadFromSingleHost] Download status: ', status + '\n')
 	global error
 	if status == 'DOWNLOAD FAILURE':
 		failureType = response[1]
@@ -104,6 +104,6 @@ def downloadFromSingleHost(hostIP, size, start, md5, fileName):
 		
 		receivedFile.close()
 
-	print('[fileDownloader.downloadFromSingleHost] Finished downloading from host: ' + str(hostIP) + '. Joining thread')
+	print('[fileDownloader.downloadFromSingleHost] Finished downloading from host: ' + str(hostIP) + '. Joining thread\n')
 
 	clientSocket.close()

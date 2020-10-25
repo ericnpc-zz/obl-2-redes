@@ -77,4 +77,4 @@ def startSending():
 def forceClose():
 	global clientSocket
 	clientSocket.close()
-	print('[announceSender.forceClose] Announce Sender Socket Closed')
+	print('[announceSender.forceClose] Announce Sender Socket Closed\n')
