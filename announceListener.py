@@ -44,12 +44,12 @@ def handleAnnouncement(message, clientAddress, serverSocket):
 
 	messageArray = message.split('\n')
 	messageType = messageArray[0]
-	print('[announceListener.handleAnnouncement] Message Type: ', messageType + '\n')
+	print('[announceListener.handleAnnouncement] Message Type: ' + messageType + '\n')
 	messageElements = messageArray[1:]
 
 	if messageType == 'ANNOUNCE':
 		messageElements.pop(len(messageElements)-1)
-		print('[announceListener.handleAnnouncement] Announce Message Elements: ', messageElements + '\n')
+		print('[announceListener.handleAnnouncement] Announce Message Elements: ' + str(messageElements) + '\n')
 
 		_remoteFiles = fileRepository.getRemoteFiles()
 
