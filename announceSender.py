@@ -64,6 +64,8 @@ def startSending():
 	clientSocket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1) 
 	clientSocket.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
 
+	print('[announceSender.startSending]\t El servidor de announce esta listo para comenzar a enviar anuncios\n')
+
 	#SEND REQUEST MESSAGE TO DISCOVER REMOTE FILES
 	message = "REQUEST\n"
 	clientSocket.sendto(message.encode(),('<broadcast>', SERVER_PORT))

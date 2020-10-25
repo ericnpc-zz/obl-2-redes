@@ -58,7 +58,7 @@ def startListening():
 	serverSocket.bind(('', serverPort))
 	serverSocket.listen(1)
 
-	print('[fileSender.startListening] El servidor de descargas esta listo para recibir pedidos\n')
+	print('[fileSender.startListening]\t El servidor de descargas esta listo para recibir pedidos\n')
 
 	while True: 
 		clientSocket, addr = serverSocket.accept()

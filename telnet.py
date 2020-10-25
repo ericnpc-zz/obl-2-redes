@@ -64,7 +64,7 @@ def telnetServer():
 	# string vacio porque https://stackoverflow.com/questions/16130786/why-am-i-getting-the-error-connection-refused-in-python-sockets/16130819
 	serverSocket.listen(1)
 
-	print('[telnet.telnetServer] El servidor de telnet esta listo para recibir comandos\n')
+	print('[telnet.telnetServer]\t\t El servidor de telnet esta listo para recibir comandos\n')
 
 	while True:
 		clientSocket, addr = serverSocket.accept()

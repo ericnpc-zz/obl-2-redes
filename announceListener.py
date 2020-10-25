@@ -109,7 +109,7 @@ def checkAvailability():
 
 
 		fileRepository.setRemoteFiles(_remoteFiles)
-		print('[announceListener.checkAvailability] Availability check', _remoteFiles + '\n')
+		print('[announceListener.checkAvailability] Current remote files: ' + str(_remoteFiles))
 		time.sleep(30)
 
 # Cierra sockets y evita la continuacion de las tareas en caso de haber ocurrido un ctrl+c.
