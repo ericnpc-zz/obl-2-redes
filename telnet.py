@@ -43,7 +43,7 @@ def telnetServer():
 	COMMAND_LIST = 'list'
 	LIST_OFFERED = 'list offered'
 
-	remoteFileListOfMD5 = []
+	remoteFileListOfMD5 = {}
 	remoteFiles = {}
 
 	serverPort = 2028
@@ -89,8 +89,10 @@ def telnetServer():
 				print(remoteFileListOfMD5)
 				print(fileId)
 				print(int(fileId))
-				if remoteFileListOfMD5.has_key(fileId):
-					fileMD5 = remoteFileListOfMD5[int(fileId)]
+				
+				fileMD5 = remoteFileListOfMD5[int(fileId)]
+				
+				if fileMD5 != '':
 
 					fileMetadata = fileRepository.getRemoteFile(fileMD5)
 
