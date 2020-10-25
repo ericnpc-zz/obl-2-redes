@@ -12,7 +12,7 @@ def sendFile(clientSocket):
 	messageFromDownloader = clientSocket.recv(4096)
 	messageFromDownloader = messageFromDownloader.split('\n')[1:]
 
-	print('[fileSender.sendFile] Download request message: ' + messageFromDownloader + '\n')
+	print('[fileSender.sendFile] Download request message: ' + str(messageFromDownloader) + '\n')
 
 	md5, start, size = messageFromDownloader
 
